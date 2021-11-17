@@ -104,3 +104,22 @@ func RuMonthName(t time.Time) string {
 
 	return longMonthNamesRuRU[t.Format("January")]
 }
+
+func RuMonthNamePrepositional(t time.Time) string {
+	var longMonthNamesRuRU = map[string]string{
+		"January":   "Январе",
+		"February":  "Феврале",
+		"March":     "Марте",
+		"April":     "Апреле",
+		"May":       "Мае",
+		"June":      "Июне",
+		"July":      "Июле",
+		"August":    "Августе",
+		"September": "Сентябре",
+		"October":   "Октябре",
+		"November":  "Ноябре",
+		"December":  "Декабре",
+	}
+
+	return longMonthNamesRuRU[t.Format("January")]
+}
