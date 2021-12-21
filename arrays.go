@@ -115,3 +115,24 @@ func IntArrFromStringArr(arr []string) []int {
 
 	return res
 }
+
+func IntArrayIntersect(a, b []int) []int {
+	if len(a) == 0 || len(b) == 0 {
+		return []int{}
+	}
+
+	res := make([]int, 0, int(math.Min(float64(len(a)), float64(len(b)))))
+	m := make(map[int]interface{})
+
+	for _, v := range a {
+		m[v] = nil
+	}
+
+	for _, v := range b {
+		if _, ok := m[v]; ok {
+			res = append(res, v)
+		}
+	}
+
+	return res
+}
