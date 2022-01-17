@@ -33,6 +33,10 @@ func StrArrayUnique(arr []string) []string {
 }
 
 func StrContainsInArrayInsensitive(arr []string, value string) bool {
+	if len(arr) == 0 || len(value) == 0 {
+		return false
+	}
+
 	value = strings.ToLower(value)
 
 	for _, v := range arr {
