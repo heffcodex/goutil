@@ -1,19 +1,45 @@
 package goutil
 
 import (
+	"encoding/json"
 	"errors"
 	"strconv"
 	"time"
+
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 const MaxTimestamp = 253402300799
 
+var ErrTimestampOutOfRange = errors.New("timestamp is out of range")
+
+var (
+	_ json.Marshaler   = (*Timestamp)(nil)
+	_ json.Unmarshaler = (*Timestamp)(nil)
+)
+
 type Timestamp struct {
-	T time.Time
+	t time.Time
+}
+
+func NewTimestamp(t time.Time) *Timestamp {
+	return &Timestamp{t: t}
+}
+
+func NewTimestampFromPB(t *timestamppb.Timestamp) *Timestamp {
+	return &Timestamp{t: t.AsTime()}
+}
+
+func (t *Timestamp) Time() time.Time {
+	return t.t
+}
+
+func (t *Timestamp) PB() *timestamppb.Timestamp {
+	return timestamppb.New(t.t)
 }
 
 func (t *Timestamp) MarshalJSON() ([]byte, error) {
-	return []byte(strconv.FormatInt(t.T.Unix(), 10)), nil
+	return []byte(strconv.FormatInt(t.t.Unix(), 10)), nil
 }
 
 func (t *Timestamp) UnmarshalJSON(data []byte) error {
@@ -21,72 +47,55 @@ func (t *Timestamp) UnmarshalJSON(data []byte) error {
 	if err != nil {
 		return err
 	} else if i < 0 || i > MaxTimestamp {
-		return errors.New("invalid timestamp")
+		return ErrTimestampOutOfRange
 	}
 
-	t.T = time.Unix(i, 0)
+	t.t = time.Unix(i, 0)
 
 	return nil
 }
 
-func StartOfDay(t time.Time) time.Time {
-	year, month, day := t.Date()
-	return time.Date(year, month, day, 0, 0, 0, 0, t.Location())
+func (t *Timestamp) StartOfDay() *Timestamp {
+	year, month, day := t.t.Date()
+	return NewTimestamp(time.Date(year, month, day, 0, 0, 0, 0, t.t.Location()))
 }
 
-func EndOfDay(t time.Time) time.Time {
-	year, month, day := t.Date()
-	return time.Date(year, month, day, 23, 59, 59, int(time.Second-time.Nanosecond), t.Location())
+func (t *Timestamp) EndOfDay() *Timestamp {
+	year, month, day := t.t.Date()
+	return NewTimestamp(time.Date(year, month, day, 23, 59, 59, int(time.Second-time.Nanosecond), t.t.Location()))
 }
 
-func StartOfWeek(t time.Time) time.Time {
-	for t.Weekday() != time.Monday {
-		t = t.AddDate(0, 0, -1)
+func (t *Timestamp) StartOfWeek() *Timestamp {
+	_t := t.t
+
+	for _t.Weekday() != time.Monday {
+		_t = _t.AddDate(0, 0, -1)
 	}
 
-	return StartOfDay(t)
+	return NewTimestamp(_t).StartOfDay()
 }
 
-func EndOfWeek(t time.Time) time.Time {
-	for t.Weekday() != time.Sunday {
-		t = t.AddDate(0, 0, 1)
+func (t *Timestamp) EndOfWeek() *Timestamp {
+	_t := t.t
+
+	for _t.Weekday() != time.Sunday {
+		_t = _t.AddDate(0, 0, 1)
 	}
 
-	return EndOfDay(t)
+	return NewTimestamp(_t).EndOfDay()
 }
 
-func StartOfMonth(t time.Time) time.Time {
-	year, month, _ := t.Date()
-	return time.Date(year, month, 1, 0, 0, 0, 0, t.Location())
+func (t *Timestamp) StartOfMonth() *Timestamp {
+	year, month, _ := t.t.Date()
+	return NewTimestamp(time.Date(year, month, 1, 0, 0, 0, 0, t.t.Location()))
 }
 
-func EndOfMonth(t time.Time) time.Time {
-	return StartOfMonth(t.AddDate(0, 1, 0)).Add(-time.Nanosecond)
+func (t *Timestamp) EndOfMonth() *Timestamp {
+	year, month, _ := t.t.AddDate(0, 1, 0).Date()
+	return NewTimestamp(time.Date(year, month, 1, 0, 0, 0, -1, t.t.Location()))
 }
 
-func TimeRef(t time.Time) *time.Time {
-	return &t
-}
-
-func TimeUnixOrNil(t *time.Time) *int64 {
-	if t == nil || t.IsZero() {
-		return nil
-	}
-
-	unix := t.Unix()
-
-	return &unix
-}
-
-func TimeRefOrNil(unix *int64) *time.Time {
-	if unix == nil || *unix < 1 {
-		return nil
-	}
-
-	return TimeRef(time.Unix(*unix, 0))
-}
-
-func RuMonthName(t time.Time) string {
+func (t *Timestamp) RuMonthName() string {
 	var longMonthNamesRuRU = map[string]string{
 		"January":   "Январь",
 		"February":  "Февраль",
@@ -102,10 +111,10 @@ func RuMonthName(t time.Time) string {
 		"December":  "Декабрь",
 	}
 
-	return longMonthNamesRuRU[t.Format("January")]
+	return longMonthNamesRuRU[t.t.Format("January")]
 }
 
-func RuMonthNamePrepositional(t time.Time) string {
+func (t *Timestamp) RuMonthNamePrepositional() string {
 	var longMonthNamesRuRU = map[string]string{
 		"January":   "Январе",
 		"February":  "Феврале",
@@ -121,5 +130,5 @@ func RuMonthNamePrepositional(t time.Time) string {
 		"December":  "Декабре",
 	}
 
-	return longMonthNamesRuRU[t.Format("January")]
+	return longMonthNamesRuRU[t.t.Format("January")]
 }

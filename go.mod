@@ -1,15 +1,11 @@
-module github.com/heffcodex/goutil
+module github.com/heffcodex/goutil/v2
 
-go 1.17
-
-require (
-	github.com/gabriel-vasile/mimetype v1.4.0
-	github.com/stretchr/testify v1.7.0
-)
+go 1.19
 
 require (
-	github.com/davecgh/go-spew v1.1.0 // indirect
-	github.com/pmezard/go-difflib v1.0.0 // indirect
-	golang.org/x/net v0.0.0-20210505024714-0287a6fb4125 // indirect
-	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c // indirect
+	github.com/gabriel-vasile/mimetype v1.4.1
+	github.com/pkg/errors v0.9.1
+	google.golang.org/protobuf v1.28.1
 )
+
+require golang.org/x/net v0.2.0 // indirect
