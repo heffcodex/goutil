@@ -1,5 +1,17 @@
 package goutil
 
+func ArrayFilter[T any](arr []T, filterFn func(item T) bool) []T {
+	res := make([]T, 0, len(arr))
+
+	for _, item := range arr {
+		if filterFn(item) {
+			res = append(res, item)
+		}
+	}
+
+	return res
+}
+
 func ArrayPluck[T, V any](arr []T, valueFn func(item T) V) []V {
 	res := make([]V, 0, len(arr))
 
