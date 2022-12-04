@@ -41,74 +41,154 @@ func TestTimestamp_PB(t *testing.T) {
 }
 
 func TestTimestamp_MarshalJSON(t *testing.T) {
-	now := time.Now()
-	s := struct {
-		Timestamp Timestamp `json:"timestamp"`
-	}{
-		Timestamp: Timestamp{t: time.Now()},
+	forTime := func(t *testing.T, tt time.Time) {
+		s := struct {
+			Timestamp Timestamp `json:"timestamp"`
+		}{
+			Timestamp: Timestamp{t: tt},
+		}
+
+		data, err := json.Marshal(s)
+		require.NoError(t, err)
+
+		expected := `{"timestamp":null}`
+		if !tt.IsZero() {
+			expected = `{"timestamp":"` + tt.Format(TimestampMarshalFormat) + `"}`
+		}
+
+		require.Equal(t, expected, string(data))
 	}
 
-	data, err := json.Marshal(s)
-	require.NoError(t, err)
-
-	require.Equal(t, `{"timestamp":"`+now.Format(TimestampMarshalFormat)+`"}`, string(data))
+	t.Run("now", func(t *testing.T) { forTime(t, time.Now()) })
+	t.Run("zero", func(t *testing.T) { forTime(t, time.Time{}) })
 }
 
 func TestTimestamp_UnmarshalJSON(t *testing.T) {
-	now := time.Now().Round(time.Second)
 	s := struct {
 		Timestamp Timestamp `json:"timestamp"`
 	}{}
 
-	err := json.Unmarshal([]byte(`{"timestamp":"`+now.Format(TimestampMarshalFormat)+`"}`), &s)
-	require.NoError(t, err)
+	t.Run(
+		"now", func(t *testing.T) {
+			now := time.Now().Round(time.Second)
+			err := json.Unmarshal([]byte(`{"timestamp":"`+now.Format(TimestampMarshalFormat)+`"}`), &s)
+			require.NoError(t, err)
+			require.Equal(t, now, s.Timestamp.Time())
+		},
+	)
 
-	require.Equal(t, now, s.Timestamp.Time())
+	t.Run(
+		"zero", func(t *testing.T) {
+			err := json.Unmarshal([]byte(`{"timestamp":null}`), &s)
+			require.NoError(t, err)
+			require.True(t, s.Timestamp.Time().IsZero())
+		},
+	)
 }
 
 func TestTimestamp_MarshalText(t *testing.T) {
-	now := time.Now()
-	ts := Timestamp{t: now}
-	data, err := ts.MarshalText()
+	t.Run(
+		"now", func(t *testing.T) {
+			now := time.Now()
+			ts := Timestamp{t: now}
+			data, err := ts.MarshalText()
 
-	require.NoError(t, err)
-	require.Equal(t, now.Format(TimestampMarshalFormat), string(data))
+			require.NoError(t, err)
+			require.Equal(t, now.Format(TimestampMarshalFormat), string(data))
+		},
+	)
+
+	t.Run(
+		"zero", func(t *testing.T) {
+			ts := Timestamp{}
+			data, err := ts.MarshalText()
+
+			require.NoError(t, err)
+			require.Empty(t, data)
+		},
+	)
 }
 
 func TestTimestamp_UnmarshalText(t *testing.T) {
-	now := time.Now().Round(time.Second)
 	ts := Timestamp{}
 
-	err := ts.UnmarshalText([]byte(now.Format(TimestampMarshalFormat)))
-	require.NoError(t, err)
+	t.Run(
+		"now", func(t *testing.T) {
+			now := time.Now().Round(time.Second)
+			err := ts.UnmarshalText([]byte(now.Format(TimestampMarshalFormat)))
+			require.NoError(t, err)
+			require.Equal(t, now, ts.Time())
+		},
+	)
 
-	require.Equal(t, now, ts.Time())
+	t.Run(
+		"zero", func(t *testing.T) {
+			err := ts.UnmarshalText([]byte(""))
+			require.NoError(t, err)
+			require.True(t, ts.Time().IsZero())
+		},
+	)
 }
 
 func TestTimestamp_MarshalBinary(t *testing.T) {
-	now := time.Now()
-	ts := Timestamp{t: now}
+	t.Run(
+		"now", func(t *testing.T) {
+			now := time.Now()
+			ts := Timestamp{t: now}
 
-	data, err := ts.MarshalBinary()
-	require.NoError(t, err)
+			data, err := ts.MarshalBinary()
+			require.NoError(t, err)
 
-	expected, err := now.MarshalBinary()
-	require.NoError(t, err)
+			expected, err := now.MarshalBinary()
+			require.NoError(t, err)
 
-	require.Equal(t, expected, data)
+			require.Equal(t, expected, data)
+		},
+	)
+
+	t.Run(
+		"zero", func(t *testing.T) {
+			ts := Timestamp{}
+
+			data, err := ts.MarshalBinary()
+			require.NoError(t, err)
+
+			expected, err := time.Time{}.MarshalBinary()
+			require.NoError(t, err)
+
+			require.Equal(t, expected, data)
+		},
+	)
 }
 
 func TestTimestamp_UnmarshalBinary(t *testing.T) {
-	now := time.Now().Round(time.Second)
 	ts := Timestamp{}
 
-	nowBin, err := now.MarshalBinary()
-	require.NoError(t, err)
+	t.Run(
+		"now", func(t *testing.T) {
+			now := time.Now().Round(time.Second)
 
-	err = ts.UnmarshalBinary(nowBin)
-	require.NoError(t, err)
+			nowBin, err := now.MarshalBinary()
+			require.NoError(t, err)
 
-	require.Equal(t, now, ts.Time())
+			err = ts.UnmarshalBinary(nowBin)
+			require.NoError(t, err)
+
+			require.Equal(t, now, ts.Time())
+		},
+	)
+
+	t.Run(
+		"zero", func(t *testing.T) {
+			nowBin, err := time.Time{}.MarshalBinary()
+			require.NoError(t, err)
+
+			err = ts.UnmarshalBinary(nowBin)
+			require.NoError(t, err)
+
+			require.True(t, ts.Time().IsZero())
+		},
+	)
 }
 
 func TestTimestamp_StartOfDay(t *testing.T) {

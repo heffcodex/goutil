@@ -44,11 +44,22 @@ func (t *Timestamp) PB() *timestamppb.Timestamp {
 }
 
 func (t Timestamp) MarshalJSON() ([]byte, error) {
+	if t.t.IsZero() {
+		return []byte(`null`), nil
+	}
+
 	return []byte(`"` + t.t.Format(TimestampMarshalFormat) + `"`), nil
 }
 
 func (t *Timestamp) UnmarshalJSON(data []byte) error {
-	_t, err := time.Parse(`"`+TimestampMarshalFormat+`"`, string(data))
+	strData := string(data)
+
+	if strData == `""` || strData == `null` {
+		t.t = time.Time{}
+		return nil
+	}
+
+	_t, err := time.Parse(`"`+TimestampMarshalFormat+`"`, strData)
 	if err != nil {
 		return err
 	}
@@ -58,10 +69,19 @@ func (t *Timestamp) UnmarshalJSON(data []byte) error {
 }
 
 func (t Timestamp) MarshalText() (text []byte, err error) {
+	if t.t.IsZero() {
+		return nil, nil
+	}
+
 	return []byte(t.t.Format(TimestampMarshalFormat)), nil
 }
 
 func (t *Timestamp) UnmarshalText(text []byte) error {
+	if len(text) == 0 {
+		t.t = time.Time{}
+		return nil
+	}
+
 	_t, err := time.Parse(TimestampMarshalFormat, string(text))
 	if err != nil {
 		return err
