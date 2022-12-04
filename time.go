@@ -1,21 +1,29 @@
 package goutil
 
 import (
+	"encoding"
 	"encoding/json"
 	"errors"
-	"strconv"
 	"time"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-const MaxTimestamp = 253402300799
+const (
+	TimestampMarshalFormat = time.RFC3339
+	StartOfWeek            = time.Monday
+	EndOfWeek              = (StartOfWeek + 6) % 7
+)
 
 var ErrTimestampOutOfRange = errors.New("timestamp is out of range")
 
 var (
-	_ json.Marshaler   = (*Timestamp)(nil)
-	_ json.Unmarshaler = (*Timestamp)(nil)
+	_ json.Marshaler             = (*Timestamp)(nil)
+	_ json.Unmarshaler           = (*Timestamp)(nil)
+	_ encoding.TextMarshaler     = (*Timestamp)(nil)
+	_ encoding.TextUnmarshaler   = (*Timestamp)(nil)
+	_ encoding.BinaryMarshaler   = (*Timestamp)(nil)
+	_ encoding.BinaryUnmarshaler = (*Timestamp)(nil)
 )
 
 type Timestamp struct {
@@ -38,20 +46,45 @@ func (t *Timestamp) PB() *timestamppb.Timestamp {
 	return timestamppb.New(t.t)
 }
 
-func (t *Timestamp) MarshalJSON() ([]byte, error) {
-	return []byte(strconv.FormatInt(t.t.Unix(), 10)), nil
+func (t Timestamp) MarshalJSON() ([]byte, error) {
+	return []byte(`"` + t.t.Format(TimestampMarshalFormat) + `"`), nil
 }
 
 func (t *Timestamp) UnmarshalJSON(data []byte) error {
-	i, err := strconv.ParseInt(string(data), 10, 64)
+	_t, err := time.Parse(`"`+TimestampMarshalFormat+`"`, string(data))
 	if err != nil {
 		return err
-	} else if i < 0 || i > MaxTimestamp {
-		return ErrTimestampOutOfRange
 	}
 
-	t.t = time.Unix(i, 0)
+	t.t = _t.Local()
+	return nil
+}
 
+func (t Timestamp) MarshalText() (text []byte, err error) {
+	return []byte(t.t.Format(TimestampMarshalFormat)), nil
+}
+
+func (t *Timestamp) UnmarshalText(text []byte) error {
+	_t, err := time.Parse(TimestampMarshalFormat, string(text))
+	if err != nil {
+		return err
+	}
+
+	t.t = _t.Local()
+	return nil
+}
+
+func (t Timestamp) MarshalBinary() (data []byte, err error) {
+	return t.t.MarshalBinary()
+}
+
+func (t *Timestamp) UnmarshalBinary(data []byte) error {
+	_t := time.Time{}
+	if err := _t.UnmarshalBinary(data); err != nil {
+		return err
+	}
+
+	t.t = _t.Local()
 	return nil
 }
 
@@ -65,20 +98,20 @@ func (t *Timestamp) EndOfDay() *Timestamp {
 	return NewTimestamp(time.Date(year, month, day, 23, 59, 59, int(time.Second-time.Nanosecond), t.t.Location()))
 }
 
-func (t *Timestamp) StartOfWeek() *Timestamp {
+func (t *Timestamp) StartOfWeek() *Timestamp { // TODO: replace with faster implementation
 	_t := t.t
 
-	for _t.Weekday() != time.Monday {
+	for _t.Weekday() != StartOfWeek {
 		_t = _t.AddDate(0, 0, -1)
 	}
 
 	return NewTimestamp(_t).StartOfDay()
 }
 
-func (t *Timestamp) EndOfWeek() *Timestamp {
+func (t *Timestamp) EndOfWeek() *Timestamp { // TODO: replace with faster implementation
 	_t := t.t
 
-	for _t.Weekday() != time.Sunday {
+	for _t.Weekday() != EndOfWeek {
 		_t = _t.AddDate(0, 0, 1)
 	}
 
