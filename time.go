@@ -3,7 +3,6 @@ package goutil
 import (
 	"encoding"
 	"encoding/json"
-	"errors"
 	"time"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -14,8 +13,6 @@ const (
 	StartOfWeek            = time.Monday
 	EndOfWeek              = (StartOfWeek + 6) % 7
 )
-
-var ErrTimestampOutOfRange = errors.New("timestamp is out of range")
 
 var (
 	_ json.Marshaler             = (*Timestamp)(nil)
