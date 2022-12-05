@@ -39,6 +39,14 @@ func (t *Timestamp) Time() time.Time {
 	return t.t
 }
 
+func (t *Timestamp) Set(_t time.Time) {
+	t.t = _t
+}
+
+func (t *Timestamp) IsZero() bool {
+	return t == nil || t.t.IsZero()
+}
+
 func (t *Timestamp) PB() *timestamppb.Timestamp {
 	return timestamppb.New(t.t)
 }

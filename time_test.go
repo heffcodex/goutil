@@ -32,6 +32,26 @@ func TestTimestamp_Time(t *testing.T) {
 	require.Equal(t, now, ts.Time())
 }
 
+func TestTimestamp_Set(t *testing.T) {
+	now := time.Now()
+	ts := Timestamp{}
+	ts.Set(now)
+
+	require.Equal(t, now, ts.Time())
+}
+
+func TestTimestamp_IsZero(t *testing.T) {
+	t.Run("now", func(t *testing.T) {
+		ts := Timestamp{t: time.Now()}
+		require.False(t, ts.IsZero())
+	})
+
+	t.Run("zero", func(t *testing.T) {
+		ts := Timestamp{}
+		require.True(t, ts.IsZero())
+	})
+}
+
 func TestTimestamp_PB(t *testing.T) {
 	now := time.Now().UTC()
 	ts := Timestamp{t: now}
@@ -81,7 +101,7 @@ func TestTimestamp_UnmarshalJSON(t *testing.T) {
 		"zero", func(t *testing.T) {
 			err := json.Unmarshal([]byte(`{"timestamp":null}`), &s)
 			require.NoError(t, err)
-			require.True(t, s.Timestamp.Time().IsZero())
+			require.True(t, s.Timestamp.IsZero())
 		},
 	)
 }
@@ -125,7 +145,7 @@ func TestTimestamp_UnmarshalText(t *testing.T) {
 		"zero", func(t *testing.T) {
 			err := ts.UnmarshalText([]byte(""))
 			require.NoError(t, err)
-			require.True(t, ts.Time().IsZero())
+			require.True(t, ts.IsZero())
 		},
 	)
 }
@@ -186,7 +206,7 @@ func TestTimestamp_UnmarshalBinary(t *testing.T) {
 			err = ts.UnmarshalBinary(nowBin)
 			require.NoError(t, err)
 
-			require.True(t, ts.Time().IsZero())
+			require.True(t, ts.IsZero())
 		},
 	)
 }
