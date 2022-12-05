@@ -1,5 +1,7 @@
 package goutil
 
+import "strings"
+
 func ArrayFilter[T any](arr []T, filterFn func(item T) bool) []T {
 	res := make([]T, 0, len(arr))
 
@@ -53,6 +55,44 @@ func ArrayIntersect[T comparable](arr1, arr2 []T) []T {
 		if _, ok := m[item]; ok {
 			res = append(res, item)
 		}
+	}
+
+	return res
+}
+
+func ArrayUnique[T comparable](arr []T) []T {
+	if len(arr) == 0 {
+		return nil
+	}
+
+	m := make(map[T]struct{}, len(arr))
+	for _, item := range arr {
+		m[item] = struct{}{}
+	}
+
+	res := make([]T, 0, len(m))
+	for item := range m {
+		res = append(res, item)
+	}
+
+	return res
+}
+
+func ArrayUniqueStrings[T string](arr []T, caseSensitive bool) []T {
+	if len(arr) == 0 {
+		return nil
+	} else if caseSensitive {
+		return ArrayUnique(arr)
+	}
+
+	m := make(map[string]T, len(arr))
+	for _, item := range arr {
+		m[strings.ToLower(string(item))] = item
+	}
+
+	res := make([]T, 0, len(m))
+	for _, item := range m {
+		res = append(res, item)
 	}
 
 	return res
