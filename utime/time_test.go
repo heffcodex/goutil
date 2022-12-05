@@ -1,4 +1,4 @@
-package goutil
+package utime
 
 import (
 	"encoding/json"
@@ -10,70 +10,49 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestNewTimestamp(t *testing.T) {
+func TestFromStdTime(t *testing.T) {
 	now := time.Now()
-	ts := NewTimestamp(now)
+	ts := FromStdTime(now)
 
-	require.Equal(t, now, ts.Time())
+	require.Equal(t, now, ts.Time)
 }
 
-func TestNewTimestampFromPB(t *testing.T) {
+func TestFromPB(t *testing.T) {
 	now := time.Now().UTC().Round(time.Nanosecond)
 	pb := timestamppb.New(now)
-	ts := NewTimestampFromPB(pb)
+	ts := FromPB(pb)
 
-	require.Equal(t, now, ts.Time())
+	require.Equal(t, now, ts.Time)
 }
 
-func TestTimestamp_Time(t *testing.T) {
+func TestTime_StdTime(t *testing.T) {
 	now := time.Now()
-	ts := Timestamp{t: now}
+	ts := Time{Time: now}
 
-	require.Equal(t, now, ts.Time())
+	require.Equal(t, now, ts.StdTime())
 }
 
-func TestTimestamp_Set(t *testing.T) {
-	now := time.Now()
-	ts := Timestamp{}
-	ts.Set(now)
-
-	require.Equal(t, now, ts.Time())
-}
-
-func TestTimestamp_IsZero(t *testing.T) {
-	t.Run("now", func(t *testing.T) {
-		ts := Timestamp{t: time.Now()}
-		require.False(t, ts.IsZero())
-	})
-
-	t.Run("zero", func(t *testing.T) {
-		ts := Timestamp{}
-		require.True(t, ts.IsZero())
-	})
-}
-
-func TestTimestamp_PB(t *testing.T) {
+func TestTime_PB(t *testing.T) {
 	now := time.Now().UTC()
-	ts := Timestamp{t: now}
-	pb := ts.PB()
+	ts := Time{Time: now}
 
-	require.Equal(t, now, pb.AsTime())
+	require.Equal(t, now, ts.PB().AsTime())
 }
 
-func TestTimestamp_MarshalJSON(t *testing.T) {
+func TestTime_MarshalJSON(t *testing.T) {
 	forTime := func(t *testing.T, tt time.Time) {
 		s := struct {
-			Timestamp Timestamp `json:"timestamp"`
+			T Time `json:"t"`
 		}{
-			Timestamp: Timestamp{t: tt},
+			T: Time{Time: tt},
 		}
 
 		data, err := json.Marshal(s)
 		require.NoError(t, err)
 
-		expected := `{"timestamp":null}`
+		expected := `{"t":null}`
 		if !tt.IsZero() {
-			expected = `{"timestamp":"` + tt.Format(TimestampMarshalFormat) + `"}`
+			expected = `{"t":"` + tt.Format(MarshalFormat) + `"}`
 		}
 
 		require.Equal(t, expected, string(data))
@@ -85,23 +64,23 @@ func TestTimestamp_MarshalJSON(t *testing.T) {
 
 func TestTimestamp_UnmarshalJSON(t *testing.T) {
 	s := struct {
-		Timestamp Timestamp `json:"timestamp"`
+		T Time `json:"t"`
 	}{}
 
 	t.Run(
 		"now", func(t *testing.T) {
 			now := time.Now().Round(time.Second)
-			err := json.Unmarshal([]byte(`{"timestamp":"`+now.Format(TimestampMarshalFormat)+`"}`), &s)
+			err := json.Unmarshal([]byte(`{"t":"`+now.Format(MarshalFormat)+`"}`), &s)
 			require.NoError(t, err)
-			require.Equal(t, now, s.Timestamp.Time())
+			require.Equal(t, now, s.T.Time)
 		},
 	)
 
 	t.Run(
 		"zero", func(t *testing.T) {
-			err := json.Unmarshal([]byte(`{"timestamp":null}`), &s)
+			err := json.Unmarshal([]byte(`{"t":null}`), &s)
 			require.NoError(t, err)
-			require.True(t, s.Timestamp.IsZero())
+			require.True(t, s.T.IsZero())
 		},
 	)
 }
@@ -110,17 +89,17 @@ func TestTimestamp_MarshalText(t *testing.T) {
 	t.Run(
 		"now", func(t *testing.T) {
 			now := time.Now()
-			ts := Timestamp{t: now}
+			ts := Time{Time: now}
 			data, err := ts.MarshalText()
 
 			require.NoError(t, err)
-			require.Equal(t, now.Format(TimestampMarshalFormat), string(data))
+			require.Equal(t, now.Format(MarshalFormat), string(data))
 		},
 	)
 
 	t.Run(
 		"zero", func(t *testing.T) {
-			ts := Timestamp{}
+			ts := Time{}
 			data, err := ts.MarshalText()
 
 			require.NoError(t, err)
@@ -130,14 +109,14 @@ func TestTimestamp_MarshalText(t *testing.T) {
 }
 
 func TestTimestamp_UnmarshalText(t *testing.T) {
-	ts := Timestamp{}
+	ts := Time{}
 
 	t.Run(
 		"now", func(t *testing.T) {
 			now := time.Now().Round(time.Second)
-			err := ts.UnmarshalText([]byte(now.Format(TimestampMarshalFormat)))
+			err := ts.UnmarshalText([]byte(now.Format(MarshalFormat)))
 			require.NoError(t, err)
-			require.Equal(t, now, ts.Time())
+			require.Equal(t, now, ts.Time)
 		},
 	)
 
@@ -154,7 +133,7 @@ func TestTimestamp_MarshalBinary(t *testing.T) {
 	t.Run(
 		"now", func(t *testing.T) {
 			now := time.Now()
-			ts := Timestamp{t: now}
+			ts := Time{Time: now}
 
 			data, err := ts.MarshalBinary()
 			require.NoError(t, err)
@@ -168,7 +147,7 @@ func TestTimestamp_MarshalBinary(t *testing.T) {
 
 	t.Run(
 		"zero", func(t *testing.T) {
-			ts := Timestamp{}
+			ts := Time{}
 
 			data, err := ts.MarshalBinary()
 			require.NoError(t, err)
@@ -182,7 +161,7 @@ func TestTimestamp_MarshalBinary(t *testing.T) {
 }
 
 func TestTimestamp_UnmarshalBinary(t *testing.T) {
-	ts := Timestamp{}
+	ts := Time{}
 
 	t.Run(
 		"now", func(t *testing.T) {
@@ -194,7 +173,7 @@ func TestTimestamp_UnmarshalBinary(t *testing.T) {
 			err = ts.UnmarshalBinary(nowBin)
 			require.NoError(t, err)
 
-			require.Equal(t, now, ts.Time())
+			require.Equal(t, now, ts.Time)
 		},
 	)
 
@@ -213,64 +192,64 @@ func TestTimestamp_UnmarshalBinary(t *testing.T) {
 
 func TestTimestamp_StartOfDay(t *testing.T) {
 	now := time.Now()
-	ts := Timestamp{t: now}
+	ts := Time{Time: now}
 	startOfDay := ts.StartOfDay()
 
 	require.Equal(
 		t,
 		time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location()),
-		startOfDay.Time(),
+		startOfDay.Time,
 	)
 }
 
 func TestTimestamp_EndOfDay(t *testing.T) {
 	now := time.Now()
-	ts := Timestamp{t: now}
+	ts := Time{Time: now}
 	endOfDay := ts.EndOfDay()
 
 	require.Equal(
 		t,
 		time.Date(now.Year(), now.Month(), now.Day(), 23, 59, 59, 999999999, now.Location()),
-		endOfDay.Time(),
+		endOfDay.Time,
 	)
 }
 
 func TestTimestamp_StartOfWeek(t *testing.T) {
 	now := time.Now()
-	ts := Timestamp{t: now}
+	ts := Time{Time: now}
 	startOfWeek := ts.StartOfWeek()
 
-	require.Equal(t, startOfWeek.Time().Weekday(), StartOfWeek)
+	require.Equal(t, startOfWeek.Time.Weekday(), StartOfWeek)
 }
 
 func TestTimestamp_EndOfWeek(t *testing.T) {
 	now := time.Now()
-	ts := Timestamp{t: now}
+	ts := Time{Time: now}
 	endOfWeek := ts.EndOfWeek()
 
-	require.Equal(t, endOfWeek.Time().Weekday(), EndOfWeek)
+	require.Equal(t, endOfWeek.Time.Weekday(), EndOfWeek())
 }
 
 func TestTimestamp_StartOfMonth(t *testing.T) {
 	now := time.Now()
-	ts := Timestamp{t: now}
+	ts := Time{Time: now}
 	startOfMonth := ts.StartOfMonth()
 
 	require.Equal(
 		t,
 		time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, now.Location()),
-		startOfMonth.Time(),
+		startOfMonth.Time,
 	)
 }
 
 func TestTimestamp_EndOfMonth(t *testing.T) {
 	now := time.Now()
-	ts := Timestamp{t: now}
+	ts := Time{Time: now}
 	endOfMonth := ts.EndOfMonth()
 
 	require.Equal(
 		t,
 		time.Date(now.Year(), now.Month()+1, 0, 23, 59, 59, 999999999, now.Location()),
-		endOfMonth.Time(),
+		endOfMonth.Time,
 	)
 }
