@@ -1,15 +1,5 @@
 package uarray
 
-func Pluck[T, V any](arr []T, valueFn func(item T) V) []V {
-	res := make([]V, 0, len(arr))
-
-	for _, item := range arr {
-		res = append(res, valueFn(item))
-	}
-
-	return res
-}
-
 func Map[T, V any](arr []T, mapFn func(item T) V) []V {
 	res := make([]V, 0, len(arr))
 
@@ -30,6 +20,6 @@ func FindIndex[T comparable](arr []T, v T) int {
 	return -1
 }
 
-func Has[T comparable](arr []T, v T) bool {
+func Contains[T comparable](arr []T, v T) bool {
 	return FindIndex(arr, v) != -1
 }
