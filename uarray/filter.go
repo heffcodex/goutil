@@ -1,6 +1,6 @@
 package uarray
 
-type FilterFn[T any] func(item T) bool
+type FilterFn[T any] TestFn[T]
 
 func Unique[T comparable]() FilterFn[T] {
 	m := make(map[T]struct{})

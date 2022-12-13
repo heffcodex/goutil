@@ -1,5 +1,7 @@
 package uarray
 
+type TestFn[T any] func(item T) bool
+
 func FromMap[K comparable, V any](m map[K]V) []V {
 	res := make([]V, 0, len(m))
 
@@ -18,18 +20,4 @@ func Map[T, V any](arr []T, mapFn func(item T) V) []V {
 	}
 
 	return res
-}
-
-func FindIndex[T comparable](arr []T, v T) int {
-	for i, item := range arr {
-		if item == v {
-			return i
-		}
-	}
-
-	return -1
-}
-
-func Contains[T comparable](arr []T, v T) bool {
-	return FindIndex(arr, v) != -1
 }
