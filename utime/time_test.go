@@ -25,6 +25,13 @@ func TestFromPB(t *testing.T) {
 	require.Equal(t, now, ts.Time)
 }
 
+func TestNow(t *testing.T) {
+	now := time.Now()
+	ts := Now()
+
+	require.True(t, now.Before(ts.Time))
+}
+
 func TestTime_StdTime(t *testing.T) {
 	now := time.Now()
 	ts := Time{Time: now}

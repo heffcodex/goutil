@@ -34,6 +34,10 @@ func FromPB(t *timestamppb.Timestamp) Time {
 	return Time{Time: t.AsTime()}
 }
 
+func Now() Time {
+	return FromStdTime(time.Now())
+}
+
 func (t Time) StdTime() time.Time {
 	return t.Time
 }
