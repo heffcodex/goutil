@@ -1,0 +1,55 @@
+package uarray
+
+import (
+	"sort"
+
+	"github.com/heffcodex/goutil/v2/types"
+	"github.com/heffcodex/goutil/v2/uflag"
+)
+
+type (
+	ClusterID                      interface{ types.ID }
+	ClusterFn[T any, I ClusterID]  func(item T) I
+	ClusterSet[T any, I ClusterID] map[I][]T
+)
+
+func (s ClusterSet[T, I]) SortedIDs(dir uflag.Direction) []I {
+	clusterIDs := make([]I, 0, len(s))
+
+	for clusterID := range s {
+		clusterIDs = append(clusterIDs, clusterID)
+	}
+
+	sort.Slice(clusterIDs, func(i, j int) bool {
+		b := clusterIDs[i] < clusterIDs[j]
+		if dir == uflag.DESC {
+			b = !b
+		}
+
+		return b
+	})
+
+	return clusterIDs
+}
+
+func (s ClusterSet[T, I]) SortedClusters(dir uflag.Direction) [][]T {
+	clusterIDs := s.SortedIDs(dir)
+	clusters := make([][]T, 0, len(s))
+
+	for _, clusterID := range clusterIDs {
+		clusters = append(clusters, s[clusterID])
+	}
+
+	return clusters
+}
+
+func Cluster[T any, I ClusterID](arr []T, fn ClusterFn[T, I]) ClusterSet[T, I] {
+	res := make(ClusterSet[T, I])
+
+	for _, item := range arr {
+		clusterID := fn(item)
+		res[clusterID] = append(res[clusterID], item)
+	}
+
+	return res
+}
