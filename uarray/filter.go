@@ -60,8 +60,8 @@ func Filter[T any](arr []T, fn ...FilterFn[T]) []T {
 	return res
 }
 
-func Len[T any](arr []T, fn ...FilterFn[T]) int {
-	l := 0
+func Count[T any](arr []T, fn ...FilterFn[T]) int {
+	count := 0
 
 	for _, item := range arr {
 		for _, f := range fn {
@@ -70,9 +70,9 @@ func Len[T any](arr []T, fn ...FilterFn[T]) int {
 			}
 		}
 
-		l++
+		count++
 	next:
 	}
 
-	return l
+	return count
 }

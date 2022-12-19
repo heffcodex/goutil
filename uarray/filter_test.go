@@ -36,16 +36,16 @@ func TestFilter(t *testing.T) {
 	require.Equal(t, []int{4}, res)
 }
 
-func TestLen(t *testing.T) {
+func TestCount(t *testing.T) {
 	arr := []int{1, 1, 2, 3, 3, 4, 5, 5}
 
-	require.Equal(t, len(arr), Len(arr, All[int]()))
-	require.Zero(t, Len(arr, None[int]()))
-	require.Equal(t, 5, Len(arr, Unique[int]()))
-	require.Equal(t, 3, Len(arr, Intersection([]int{1, 4})))
-	require.Equal(t, 2, Len(arr, Unique[int](), Intersection([]int{1, 4})))
-	require.Equal(t, 2, Len(arr, func(item int) bool { return item%2 == 0 }))
-	require.Equal(t, 1, Len(
+	require.Equal(t, len(arr), Count(arr, All[int]()))
+	require.Zero(t, Count(arr, None[int]()))
+	require.Equal(t, 5, Count(arr, Unique[int]()))
+	require.Equal(t, 3, Count(arr, Intersection([]int{1, 4})))
+	require.Equal(t, 2, Count(arr, Unique[int](), Intersection([]int{1, 4})))
+	require.Equal(t, 2, Count(arr, func(item int) bool { return item%2 == 0 }))
+	require.Equal(t, 1, Count(
 		arr,
 		func(item int) bool { return item%2 == 0 },
 		func(item int) bool { return item > 2 },
