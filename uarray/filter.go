@@ -59,3 +59,20 @@ func Filter[T any](arr []T, fn ...FilterFn[T]) []T {
 
 	return res
 }
+
+func Len[T any](arr []T, fn ...FilterFn[T]) int {
+	l := 0
+
+	for _, item := range arr {
+		for _, f := range fn {
+			if !f(item) {
+				goto next
+			}
+		}
+
+		l++
+	next:
+	}
+
+	return l
+}
