@@ -13,7 +13,13 @@ var (
 	StartOfWeek   = time.Monday
 )
 
-func EndOfWeek() time.Weekday { return (StartOfWeek + 6) % 7 }
+func EndOfWeek(startOfWeek time.Weekday) time.Weekday {
+	return (startOfWeek + 6) % 7
+}
+
+func LocalWeekday(startOfWeek time.Weekday, wd time.Weekday) int {
+	return int(7+wd-startOfWeek) % 7
+}
 
 var (
 	_ json.Marshaler             = (*Time)(nil)
@@ -118,25 +124,16 @@ func (t Time) EndOfDay() Time {
 	return FromStdTime(time.Date(year, month, day, 23, 59, 59, int(time.Second-time.Nanosecond), t.Location()))
 }
 
-func (t Time) StartOfWeek() Time { // TODO: replace with faster implementation
-	_t := t.Time
-
-	for _t.Weekday() != StartOfWeek {
-		_t = _t.AddDate(0, 0, -1)
-	}
-
-	return FromStdTime(_t).StartOfDay()
+func (t Time) LocalWeekday() int {
+	return LocalWeekday(StartOfWeek, t.Weekday())
 }
 
-func (t Time) EndOfWeek() Time { // TODO: replace with faster implementation
-	_t := t.Time
-	eow := EndOfWeek()
+func (t Time) StartOfWeek() Time {
+	return FromStdTime(t.AddDate(0, 0, -t.LocalWeekday())).StartOfDay()
+}
 
-	for _t.Weekday() != eow {
-		_t = _t.AddDate(0, 0, 1)
-	}
-
-	return FromStdTime(_t).EndOfDay()
+func (t Time) EndOfWeek() Time {
+	return FromStdTime(t.AddDate(0, 0, 6-t.LocalWeekday())).EndOfDay()
 }
 
 func (t Time) StartOfMonth() Time {

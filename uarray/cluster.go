@@ -3,12 +3,12 @@ package uarray
 import (
 	"sort"
 
-	"github.com/heffcodex/goutil/v2/types"
 	"github.com/heffcodex/goutil/v2/uflag"
+	"github.com/heffcodex/goutil/v2/utype"
 )
 
 type (
-	ClusterID                      interface{ types.ID }
+	ClusterID                      interface{ utype.ID }
 	ClusterFn[T any, I ClusterID]  func(item T) I
 	ClusterSet[T any, I ClusterID] map[I][]T
 )

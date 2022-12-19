@@ -1,4 +1,4 @@
-package types
+package utype
 
 type Int interface {
 	int | int8 | int16 | int32 | int64
@@ -8,8 +8,16 @@ type Uint interface {
 	uint | uint8 | uint16 | uint32 | uint64
 }
 
+type Integer interface {
+	Int | Uint
+}
+
 type Float interface {
 	float32 | float64
+}
+
+type Real interface {
+	Integer | Float
 }
 
 type Complex interface {
@@ -17,7 +25,7 @@ type Complex interface {
 }
 
 type Number interface {
-	Int | Uint | Float | Complex
+	Real | Complex
 }
 
 type Char interface {
@@ -25,5 +33,5 @@ type Char interface {
 }
 
 type ID interface {
-	Int | Uint | Float | Char | string | uintptr
+	Real | Char | string | uintptr
 }
