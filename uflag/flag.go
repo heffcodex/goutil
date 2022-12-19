@@ -1,8 +1,8 @@
 package uflag
 
-type Direction bool
+type Order bool
 
 const (
-	ASC  Direction = false
-	DESC Direction = true
+	ASC  Order = false
+	DESC Order = true
 )

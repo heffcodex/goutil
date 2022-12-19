@@ -1,12 +1,12 @@
-package goutil
+package usync
 
 import (
 	"sync"
 )
 
-type SyncMap[K comparable, V any] struct{ sync.Map }
+type Map[K comparable, V any] struct{ sync.Map }
 
-func (m *SyncMap[K, V]) Load(key K) (value V, ok bool) {
+func (m *Map[K, V]) Load(key K) (value V, ok bool) {
 	_value, _ok := m.Map.Load(key)
 	if !_ok {
 		var nilV V
@@ -17,20 +17,20 @@ func (m *SyncMap[K, V]) Load(key K) (value V, ok bool) {
 	return
 }
 
-func (m *SyncMap[K, V]) Store(key K, value V) { m.Map.Store(key, value) }
+func (m *Map[K, V]) Store(key K, value V) { m.Map.Store(key, value) }
 
-func (m *SyncMap[K, V]) LoadOrStore(key K, value V) (actual V, loaded bool) {
+func (m *Map[K, V]) LoadOrStore(key K, value V) (actual V, loaded bool) {
 	_actual, _loaded := m.Map.LoadOrStore(key, value)
 	return _actual.(V), _loaded
 }
 
-func (m *SyncMap[K, V]) Delete(key ...K) {
+func (m *Map[K, V]) Delete(key ...K) {
 	for _, k := range key {
 		m.Map.Delete(k)
 	}
 }
 
-func (m *SyncMap[K, V]) Range(f func(key K, value V) bool) {
+func (m *Map[K, V]) Range(f func(key K, value V) bool) {
 	m.Map.Range(
 		func(key, value any) bool {
 			return f(key.(K), value.(V))
@@ -38,7 +38,7 @@ func (m *SyncMap[K, V]) Range(f func(key K, value V) bool) {
 	)
 }
 
-func (m *SyncMap[K, V]) Len() int {
+func (m *Map[K, V]) Len() int {
 	l := 0
 
 	m.Range(
@@ -51,7 +51,7 @@ func (m *SyncMap[K, V]) Len() int {
 	return l
 }
 
-func (m *SyncMap[K, V]) Keys() []K {
+func (m *Map[K, V]) Keys() []K {
 	keys := make([]K, 0)
 
 	m.Range(
@@ -64,7 +64,7 @@ func (m *SyncMap[K, V]) Keys() []K {
 	return keys
 }
 
-func (m *SyncMap[K, V]) Values() []V {
+func (m *Map[K, V]) Values() []V {
 	values := make([]V, 0)
 
 	m.Range(

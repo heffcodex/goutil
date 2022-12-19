@@ -1,4 +1,4 @@
-package goutil
+package uvalue
 
 import (
 	"reflect"
@@ -10,6 +10,9 @@ type zeroer interface {
 	IsZero() bool
 }
 
+// IsZero returns true if the value is nil or its underlying value is equal to the zero value for its type.
+// Works only with comparable types due to the current limitations of the language.
+// Warning: this function may use slow reflection.
 func IsZero[T comparable](v T) bool {
 	if v == *new(T) {
 		return true
@@ -25,24 +28,4 @@ func IsZero[T comparable](v T) bool {
 	}
 
 	return false
-}
-
-func Ref[T any](v T) *T {
-	return &v
-}
-
-func RefOrNil[T comparable](v T) *T {
-	if IsZero(v) {
-		return nil
-	}
-
-	return Ref(v)
-}
-
-func PassIf[T any](obj T, test func() bool) T {
-	if test() {
-		return obj
-	}
-
-	return *new(T)
 }

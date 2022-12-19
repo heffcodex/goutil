@@ -1,4 +1,4 @@
-package goutil
+package uconst
 
 const (
 	Bit  = 1

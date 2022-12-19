@@ -13,7 +13,7 @@ type (
 	ClusterSet[T any, I ClusterID] map[I][]T
 )
 
-func (s ClusterSet[T, I]) SortedIDs(dir uflag.Direction) []I {
+func (s ClusterSet[T, I]) SortedIDs(order uflag.Order) []I {
 	clusterIDs := make([]I, 0, len(s))
 
 	for clusterID := range s {
@@ -22,7 +22,7 @@ func (s ClusterSet[T, I]) SortedIDs(dir uflag.Direction) []I {
 
 	sort.Slice(clusterIDs, func(i, j int) bool {
 		b := clusterIDs[i] < clusterIDs[j]
-		if dir == uflag.DESC {
+		if order == uflag.DESC {
 			b = !b
 		}
 
@@ -32,8 +32,8 @@ func (s ClusterSet[T, I]) SortedIDs(dir uflag.Direction) []I {
 	return clusterIDs
 }
 
-func (s ClusterSet[T, I]) SortedClusters(dir uflag.Direction) [][]T {
-	clusterIDs := s.SortedIDs(dir)
+func (s ClusterSet[T, I]) SortedClusters(order uflag.Order) [][]T {
+	clusterIDs := s.SortedIDs(order)
 	clusters := make([][]T, 0, len(s))
 
 	for _, clusterID := range clusterIDs {

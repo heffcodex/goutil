@@ -1,4 +1,4 @@
-package goutil
+package umime
 
 import (
 	"io"
@@ -11,7 +11,7 @@ import (
 
 var ErrInvalidMIME = errors.New("invalid MIME")
 
-func MIMEValidate(f io.Reader, allowedTypes ...string) (*mimetype.MIME, error) {
+func Validate(f io.Reader, allowedTypes ...string) (*mimetype.MIME, error) {
 	mime, err := mimetype.DetectReader(f)
 	if err != nil {
 		return nil, err
@@ -26,7 +26,7 @@ func MIMEValidate(f io.Reader, allowedTypes ...string) (*mimetype.MIME, error) {
 	return nil, ErrInvalidMIME
 }
 
-func MIMEReplaceExtension(filename string, mime *mimetype.MIME) string {
+func ReplaceExt(filename string, mime *mimetype.MIME) string {
 	ext := path.Ext(filename)
 	validExt := mime.Extension()
 
@@ -34,13 +34,5 @@ func MIMEReplaceExtension(filename string, mime *mimetype.MIME) string {
 		return filename
 	}
 
-	parts := strings.Split(filename, ".")
-
-	if len(parts) < 2 {
-		return filename + validExt
-	}
-
-	parts[len(parts)-1] = validExt
-
-	return strings.Join(parts, ".")
+	return strings.TrimSuffix(filename, ext) + validExt
 }
