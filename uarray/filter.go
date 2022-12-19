@@ -5,12 +5,12 @@ type FilterFn[T any] TestFn[T]
 func Unique[T comparable]() FilterFn[T] {
 	m := make(map[T]struct{})
 
-	return func(item T) bool {
-		if _, ok := m[item]; ok {
+	return func(arr []T, i int) bool {
+		if _, ok := m[arr[i]]; ok {
 			return false
 		}
 
-		m[item] = struct{}{}
+		m[arr[i]] = struct{}{}
 		return true
 	}
 }
@@ -25,20 +25,20 @@ func Intersection[T comparable](arr []T) FilterFn[T] {
 		m[item] = struct{}{}
 	}
 
-	return func(item T) bool {
-		_, ok := m[item]
+	return func(arr []T, i int) bool {
+		_, ok := m[arr[i]]
 		return ok
 	}
 }
 
 func All[T any]() FilterFn[T] {
-	return func(item T) bool {
+	return func(arr []T, i int) bool {
 		return true
 	}
 }
 
 func None[T any]() FilterFn[T] {
-	return func(item T) bool {
+	return func(arr []T, i int) bool {
 		return false
 	}
 }
@@ -46,14 +46,14 @@ func None[T any]() FilterFn[T] {
 func Filter[T any](arr []T, fn ...FilterFn[T]) []T {
 	res := make([]T, 0, len(arr))
 
-	for _, item := range arr {
+	for i := range arr {
 		for _, f := range fn {
-			if !f(item) {
+			if !f(arr, i) {
 				goto next
 			}
 		}
 
-		res = append(res, item)
+		res = append(res, arr[i])
 	next:
 	}
 
@@ -63,9 +63,9 @@ func Filter[T any](arr []T, fn ...FilterFn[T]) []T {
 func Count[T any](arr []T, fn ...FilterFn[T]) int {
 	count := 0
 
-	for _, item := range arr {
+	for i := range arr {
 		for _, f := range fn {
-			if !f(item) {
+			if !f(arr, i) {
 				goto next
 			}
 		}

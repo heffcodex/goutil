@@ -4,16 +4,22 @@ const IdxNotFound = -1
 
 type MatchFn[T any] TestFn[T]
 
-func Value[T comparable](v T) MatchFn[T] {
-	return func(item T) bool {
-		return item == v
+func Value[T comparable](value T) MatchFn[T] {
+	return func(arr []T, i int) bool {
+		return arr[i] == value
+	}
+}
+
+func Not[T comparable](f MatchFn[T]) MatchFn[T] {
+	return func(arr []T, i int) bool {
+		return !f(arr, i)
 	}
 }
 
 func Any[T comparable](fn ...MatchFn[T]) MatchFn[T] {
-	return func(item T) bool {
+	return func(arr []T, i int) bool {
 		for _, f := range fn {
-			if f(item) {
+			if f(arr, i) {
 				return true
 			}
 		}
@@ -23,14 +29,16 @@ func Any[T comparable](fn ...MatchFn[T]) MatchFn[T] {
 }
 
 func AnyValue[T comparable](values ...T) MatchFn[T] {
-	return func(item T) bool {
-		return Any(Map(values, func(value T) MatchFn[T] { return Value(value) })...)(item)
+	return func(arr []T, i int) bool {
+		return Any(mapValues(values)...)(arr, i)
 	}
 }
 
+func mapValues[T comparable](values []T) []MatchFn[T] { return Map(values, Value[T]) }
+
 func FindIndex[T any](arr []T, f MatchFn[T]) int {
-	for i, item := range arr {
-		if f(item) {
+	for i := range arr {
+		if f(arr, i) {
 			return i
 		}
 	}
