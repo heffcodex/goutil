@@ -11,3 +11,13 @@ func Map[T, V any](arr []T, mapFn func(item T) V) []V {
 
 	return res
 }
+
+func Merge[T any](arrays ...[]T) []T {
+	res := make([]T, 0)
+
+	for _, arr := range arrays {
+		res = append(res, arr...)
+	}
+
+	return res
+}
