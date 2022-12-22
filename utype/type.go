@@ -1,11 +1,15 @@
 package utype
 
+import (
+	"golang.org/x/exp/constraints"
+)
+
 type Int interface {
-	int | int8 | int16 | int32 | int64
+	constraints.Signed
 }
 
 type Uint interface {
-	uint | uint8 | uint16 | uint32 | uint64
+	constraints.Unsigned
 }
 
 type Integer interface {
@@ -13,7 +17,7 @@ type Integer interface {
 }
 
 type Float interface {
-	float32 | float64
+	constraints.Float
 }
 
 type Real interface {
@@ -21,7 +25,7 @@ type Real interface {
 }
 
 type Complex interface {
-	complex64 | complex128
+	constraints.Complex
 }
 
 type Number interface {
@@ -29,9 +33,9 @@ type Number interface {
 }
 
 type Char interface {
-	byte | rune
+	~byte | ~rune
 }
 
 type ID interface {
-	Real | Char | string | uintptr
+	Real | Char | ~string | ~uintptr
 }

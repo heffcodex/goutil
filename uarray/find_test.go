@@ -15,14 +15,6 @@ func TestFindIndex(t *testing.T) {
 
 		idx = FindIndex(arr, Value(6))
 		require.Equal(t, IdxNotFound, idx)
-
-		t.Run("not", func(t *testing.T) {
-			idx = FindIndex(arr, Not(Value(3)))
-			require.Equal(t, 0, idx)
-
-			idx = FindIndex(arr, Not(Value(1)))
-			require.Equal(t, 1, idx)
-		})
 	})
 
 	t.Run("any", func(t *testing.T) {
@@ -37,20 +29,6 @@ func TestFindIndex(t *testing.T) {
 			func(arr []int, i int) bool { return arr[i] == 6 },
 		))
 		require.Equal(t, IdxNotFound, idx)
-
-		t.Run("not", func(t *testing.T) {
-			idx = FindIndex(arr, Any(
-				func(arr []int, i int) bool { return arr[i] == 0 },
-				Not(func(arr []int, i int) bool { return arr[i] == 3 }),
-			))
-			require.Equal(t, 0, idx)
-
-			idx = FindIndex(arr, Any(
-				func(arr []int, i int) bool { return arr[i] == 0 },
-				Not(func(arr []int, i int) bool { return arr[i] == 1 }),
-			))
-			require.Equal(t, 1, idx)
-		})
 	})
 
 	t.Run("any value", func(t *testing.T) {

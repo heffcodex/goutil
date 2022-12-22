@@ -17,7 +17,7 @@ func Unique[T comparable]() FilterFn[T] {
 
 func Intersection[T comparable](arr []T) FilterFn[T] {
 	if len(arr) == 0 {
-		return None[T]()
+		return none[T]()
 	}
 
 	m := make(map[T]struct{}, len(arr))
@@ -31,13 +31,7 @@ func Intersection[T comparable](arr []T) FilterFn[T] {
 	}
 }
 
-func All[T any]() FilterFn[T] {
-	return func(arr []T, i int) bool {
-		return true
-	}
-}
-
-func None[T any]() FilterFn[T] {
+func none[T any]() FilterFn[T] {
 	return func(arr []T, i int) bool {
 		return false
 	}

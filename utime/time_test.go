@@ -56,6 +56,13 @@ func TestNow(t *testing.T) {
 	require.True(t, now.Before(ut.Time) || now.Equal(ut.Time))
 }
 
+func TestDate(t *testing.T) {
+	tt := testTime()
+	ut := Date(tt.Year(), tt.Month(), tt.Day(), tt.Hour(), tt.Minute(), tt.Second(), tt.Nanosecond(), tt.Location())
+
+	require.Equal(t, tt, ut.Time)
+}
+
 func TestTime_StdTime(t *testing.T) {
 	tt := testTime()
 	ut := Time{Time: tt}
@@ -219,6 +226,98 @@ func TestTime_UnmarshalBinary(t *testing.T) {
 			require.True(t, ut.IsZero())
 		},
 	)
+}
+
+func TestTime_AddDate(t *testing.T) {
+	tt := testTime()
+	ut := Time{Time: tt}
+
+	tt.AddDate(1, 2, 3)
+	ut.AddDate(1, 2, 3)
+
+	require.Equal(t, tt, ut.Time)
+}
+
+func TestTime_Add(t *testing.T) {
+	tt := testTime()
+	ut := Time{Time: tt}
+
+	tt.Add(time.Hour)
+	ut.Add(time.Hour)
+
+	require.Equal(t, tt, ut.Time)
+}
+
+func TestTime_Sub(t *testing.T) {
+	tt := testTime()
+	ut := Time{Time: tt}
+	sub := time.Now()
+
+	tt.Sub(sub)
+	ut.Sub(Time{Time: sub})
+
+	require.Equal(t, tt, ut.Time)
+}
+
+func TestTime_UTC(t *testing.T) {
+	tt := testTime()
+	ut := Time{Time: tt}
+
+	tt.UTC()
+	ut.UTC()
+
+	require.Equal(t, tt, ut.Time)
+}
+
+func TestTime_Local(t *testing.T) {
+	tt := testTime()
+	ut := Time{Time: tt}
+
+	tt.Local()
+	ut.Local()
+
+	require.Equal(t, tt, ut.Time)
+}
+
+func TestTime_In(t *testing.T) {
+	tt := testTime()
+	ut := Time{Time: tt}
+
+	tt.In(time.UTC)
+	ut.In(time.UTC)
+
+	require.Equal(t, tt, ut.Time)
+}
+
+func TestTime_ZoneBounds(t *testing.T) {
+	tt := testTime()
+	ut := Time{Time: tt}
+
+	a, b := tt.ZoneBounds()
+	c, d := ut.ZoneBounds()
+
+	require.Equal(t, a, c.Time)
+	require.Equal(t, b, d.Time)
+}
+
+func TestTime_Truncate(t *testing.T) {
+	tt := testTime()
+	ut := Time{Time: tt}
+
+	tt.Truncate(time.Hour)
+	ut.Truncate(time.Hour)
+
+	require.Equal(t, tt, ut.Time)
+}
+
+func TestTime_Round(t *testing.T) {
+	tt := testTime()
+	ut := Time{Time: tt}
+
+	tt.Round(time.Hour)
+	ut.Round(time.Hour)
+
+	require.Equal(t, tt, ut.Time)
 }
 
 func TestTime_LocalWeekday(t *testing.T) {

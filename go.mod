@@ -6,6 +6,7 @@ require (
 	github.com/gabriel-vasile/mimetype v1.4.1
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.8.1
+	golang.org/x/exp v0.0.0-20221217163422-3c43f8badb15
 	google.golang.org/protobuf v1.28.1
 )
 

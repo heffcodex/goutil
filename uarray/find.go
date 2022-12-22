@@ -10,12 +10,6 @@ func Value[T comparable](value T) MatchFn[T] {
 	}
 }
 
-func Not[T comparable](f MatchFn[T]) MatchFn[T] {
-	return func(arr []T, i int) bool {
-		return !f(arr, i)
-	}
-}
-
 func Any[T comparable](fn ...MatchFn[T]) MatchFn[T] {
 	return func(arr []T, i int) bool {
 		for _, f := range fn {

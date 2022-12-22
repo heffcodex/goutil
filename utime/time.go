@@ -32,6 +32,8 @@ var (
 
 type Time struct{ time.Time }
 
+// constructors:
+
 func FromStdTime(t time.Time) Time {
 	return Time{Time: t}
 }
@@ -41,8 +43,14 @@ func FromPB(t *timestamppb.Timestamp) Time {
 }
 
 func Now() Time {
-	return FromStdTime(time.Now())
+	return Time{Time: time.Now()}
 }
+
+func Date(year int, month time.Month, day, hour, min, sec, nsec int, loc *time.Location) Time {
+	return Time{Time: time.Date(year, month, day, hour, min, sec, nsec, loc)}
+}
+
+// converters:
 
 func (t Time) StdTime() time.Time {
 	return t.Time
@@ -51,6 +59,8 @@ func (t Time) StdTime() time.Time {
 func (t Time) PB() *timestamppb.Timestamp {
 	return timestamppb.New(t.Time)
 }
+
+// (un)marshalers:
 
 func (t Time) MarshalJSON() ([]byte, error) {
 	if t.IsZero() {
@@ -114,6 +124,47 @@ func (t *Time) UnmarshalBinary(data []byte) error {
 	return nil
 }
 
+// time.Time wrappers:
+
+func (t Time) AddDate(years, months, days int) Time {
+	return Time{Time: t.Time.AddDate(years, months, days)}
+}
+
+func (t Time) Add(d time.Duration) Time {
+	return Time{Time: t.Time.Add(d)}
+}
+
+func (t Time) Sub(u Time) time.Duration {
+	return t.Time.Sub(u.Time)
+}
+
+func (t Time) UTC() Time {
+	return Time{Time: t.Time.UTC()}
+}
+
+func (t Time) Local() Time {
+	return Time{Time: t.Time.Local()}
+}
+
+func (t Time) In(loc *time.Location) Time {
+	return Time{Time: t.Time.In(loc)}
+}
+
+func (t Time) ZoneBounds() (start, end Time) {
+	_start, _end := t.Time.ZoneBounds()
+	return Time{Time: _start}, Time{Time: _end}
+}
+
+func (t Time) Truncate(d time.Duration) Time {
+	return Time{Time: t.Time.Truncate(d)}
+}
+
+func (t Time) Round(d time.Duration) Time {
+	return Time{Time: t.Time.Round(d)}
+}
+
+// utility functions:
+
 func (t Time) StartOfDay() Time {
 	year, month, day := t.Date()
 	return FromStdTime(time.Date(year, month, day, 0, 0, 0, 0, t.Location()))
@@ -129,21 +180,21 @@ func (t Time) LocalWeekday() int {
 }
 
 func (t Time) StartOfWeek() Time {
-	return FromStdTime(t.AddDate(0, 0, -t.LocalWeekday())).StartOfDay()
+	return t.AddDate(0, 0, -t.LocalWeekday()).StartOfDay()
 }
 
 func (t Time) EndOfWeek() Time {
-	return FromStdTime(t.AddDate(0, 0, 6-t.LocalWeekday())).EndOfDay()
+	return t.AddDate(0, 0, 6-t.LocalWeekday()).EndOfDay()
 }
 
 func (t Time) StartOfMonth() Time {
 	year, month, _ := t.Date()
-	return FromStdTime(time.Date(year, month, 1, 0, 0, 0, 0, t.Location()))
+	return Date(year, month, 1, 0, 0, 0, 0, t.Location())
 }
 
 func (t Time) EndOfMonth() Time {
 	year, month, _ := t.AddDate(0, 1, 0).Date()
-	return FromStdTime(time.Date(year, month, 1, 0, 0, 0, -1, t.Location()))
+	return Date(year, month, 1, 0, 0, 0, -1, t.Location())
 }
 
 func (t *Time) RuMonthName() string {

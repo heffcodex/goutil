@@ -10,12 +10,6 @@ func TestFilter(t *testing.T) {
 	arr := []int{1, 1, 2, 3, 3, 4, 5, 5}
 	res := make([]int, 0, len(arr))
 
-	res = Filter(arr, All[int]())
-	require.Equal(t, arr, res)
-
-	res = Filter(arr, None[int]())
-	require.Empty(t, res)
-
 	res = Filter(arr, Unique[int]())
 	require.Equal(t, []int{1, 2, 3, 4, 5}, res)
 
@@ -39,8 +33,6 @@ func TestFilter(t *testing.T) {
 func TestCount(t *testing.T) {
 	arr := []int{1, 1, 2, 3, 3, 4, 5, 5}
 
-	require.Equal(t, len(arr), Count(arr, All[int]()))
-	require.Zero(t, Count(arr, None[int]()))
 	require.Equal(t, 5, Count(arr, Unique[int]()))
 	require.Equal(t, 3, Count(arr, Intersection([]int{1, 4})))
 	require.Equal(t, 2, Count(arr, Unique[int](), Intersection([]int{1, 4})))
