@@ -126,6 +126,18 @@ func (t *Time) UnmarshalBinary(data []byte) error {
 
 // time.Time wrappers:
 
+func (t Time) After(u Time) bool {
+	return t.Time.After(u.Time)
+}
+
+func (t Time) Before(u Time) bool {
+	return t.Time.Before(u.Time)
+}
+
+func (t Time) Equal(u Time) bool {
+	return t.Time.Equal(u.Time)
+}
+
 func (t Time) AddDate(years, months, days int) Time {
 	return Time{Time: t.Time.AddDate(years, months, days)}
 }
@@ -164,6 +176,10 @@ func (t Time) Round(d time.Duration) Time {
 }
 
 // utility functions:
+
+func (t Time) Between(start, end Time) bool {
+	return (t.After(start) || t.Equal(start)) && (t.Before(end) || t.Equal(end))
+}
 
 func (t Time) StartOfDay() Time {
 	year, month, day := t.Date()

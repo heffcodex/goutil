@@ -228,6 +228,30 @@ func TestTime_UnmarshalBinary(t *testing.T) {
 	)
 }
 
+func TestTime_After(t *testing.T) {
+	tt := testTime()
+	ut := Time{Time: tt}
+
+	require.True(t, ut.After(Time{Time: tt.Add(-time.Second)}))
+	require.False(t, ut.After(Time{Time: tt.Add(time.Second)}))
+}
+
+func TestTime_Before(t *testing.T) {
+	tt := testTime()
+	ut := Time{Time: tt}
+
+	require.True(t, ut.Before(Time{Time: tt.Add(time.Second)}))
+	require.False(t, ut.Before(Time{Time: tt.Add(-time.Second)}))
+}
+
+func TestTime_Equal(t *testing.T) {
+	tt := testTime()
+	ut := Time{Time: tt}
+
+	require.True(t, ut.Equal(Time{Time: tt}))
+	require.False(t, ut.Equal(Time{Time: tt.Add(time.Second)}))
+}
+
 func TestTime_AddDate(t *testing.T) {
 	tt := testTime()
 	ut := Time{Time: tt}
@@ -318,6 +342,14 @@ func TestTime_Round(t *testing.T) {
 	ut.Round(time.Hour)
 
 	require.Equal(t, tt, ut.Time)
+}
+
+func TestTime_Between(t *testing.T) {
+	tt := testTime()
+	ut := Time{Time: tt}
+
+	require.True(t, ut.Between(Time{Time: tt.Add(-time.Second)}, Time{Time: tt.Add(time.Second)}))
+	require.False(t, ut.Between(Time{Time: tt.Add(time.Second)}, Time{Time: tt.Add(time.Second * 2)}))
 }
 
 func TestTime_LocalWeekday(t *testing.T) {
