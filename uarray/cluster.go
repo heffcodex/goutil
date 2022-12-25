@@ -47,9 +47,15 @@ func Cluster[T any, I ClusterID](arr []T, fn ...ClusterFn[T, I]) ClusterSet[T, I
 	res := make(ClusterSet[T, I])
 
 	for _, item := range arr {
+		usedIDs := make(map[I]struct{}, len(fn))
+
 		for _, f := range fn {
 			clusterID := f(item)
-			res[clusterID] = append(res[clusterID], item)
+			
+			if _, ok := usedIDs[clusterID]; !ok {
+				res[clusterID] = append(res[clusterID], item)
+				usedIDs[clusterID] = struct{}{}
+			}
 		}
 	}
 
