@@ -43,12 +43,14 @@ func (s ClusterSet[T, I]) SortedClusters(order uflag.Order) [][]T {
 	return clusters
 }
 
-func Cluster[T any, I ClusterID](arr []T, fn ClusterFn[T, I]) ClusterSet[T, I] {
+func Cluster[T any, I ClusterID](arr []T, fn ...ClusterFn[T, I]) ClusterSet[T, I] {
 	res := make(ClusterSet[T, I])
 
 	for _, item := range arr {
-		clusterID := fn(item)
-		res[clusterID] = append(res[clusterID], item)
+		for _, f := range fn {
+			clusterID := f(item)
+			res[clusterID] = append(res[clusterID], item)
+		}
 	}
 
 	return res

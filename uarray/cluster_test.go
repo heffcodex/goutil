@@ -11,10 +11,14 @@ import (
 func TestCluster(t *testing.T) {
 	arr := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
 
-	cluster := Cluster(arr, func(item int) int { return item % 3 })
+	cluster := Cluster(
+		arr,
+		func(item int) int { return item % 3 },
+		func(item int) int { return item % 2 },
+	)
 	require.Equal(t, 3, len(cluster))
-	require.ElementsMatch(t, []int{3, 6, 9}, cluster[0])
-	require.ElementsMatch(t, []int{1, 4, 7, 10}, cluster[1])
+	require.ElementsMatch(t, []int{2, 3, 4, 6, 6, 8, 9, 10}, cluster[0])
+	require.ElementsMatch(t, []int{1, 1, 3, 4, 5, 7, 7, 9, 10}, cluster[1])
 	require.ElementsMatch(t, []int{2, 5, 8}, cluster[2])
 
 	ascID := cluster.SortedIDs(uflag.ASC)
@@ -24,8 +28,8 @@ func TestCluster(t *testing.T) {
 	require.Equal(t, []int{2, 1, 0}, descID)
 
 	ascCluster := cluster.SortedClusters(uflag.ASC)
-	require.Equal(t, [][]int{{3, 6, 9}, {1, 4, 7, 10}, {2, 5, 8}}, ascCluster)
-	
+	require.Equal(t, [][]int{{2, 3, 4, 6, 6, 8, 9, 10}, {1, 1, 3, 4, 5, 7, 7, 9, 10}, {2, 5, 8}}, ascCluster)
+
 	descCluster := cluster.SortedClusters(uflag.DESC)
-	require.Equal(t, [][]int{{2, 5, 8}, {1, 4, 7, 10}, {3, 6, 9}}, descCluster)
+	require.Equal(t, [][]int{{2, 5, 8}, {1, 1, 3, 4, 5, 7, 7, 9, 10}, {2, 3, 4, 6, 6, 8, 9, 10}}, descCluster)
 }
