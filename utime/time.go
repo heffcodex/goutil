@@ -209,8 +209,8 @@ func (t Time) StartOfMonth() Time {
 }
 
 func (t Time) EndOfMonth() Time {
-	year, month, _ := t.AddDate(0, 1, 0).Date()
-	return Date(year, month, 1, 0, 0, 0, -1, t.Location())
+	year, month, _ := t.Date()
+	return Date(year, month+1, 1, 0, 0, 0, -1, t.Location())
 }
 
 func (t *Time) RuMonthName() string {
