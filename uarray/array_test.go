@@ -20,3 +20,9 @@ func TestMerge(t *testing.T) {
 	res := Merge(arr1, arr2, arr3)
 	require.Equal(t, []int{1, 2, 3, 4, 5, 6, 7, 8, 9}, res)
 }
+
+func TestReverse(t *testing.T) {
+	arr := []int{1, 2, 3, 4, 5}
+	Reverse(arr)
+	require.Equal(t, []int{5, 4, 3, 2, 1}, arr)
+}
