@@ -1,32 +1,38 @@
 package uarray
 
-type FilterFn[T any] TestFn[T]
+import "github.com/heffcodex/goutil/v2/utype"
 
-func Unique[T comparable]() FilterFn[T] {
-	m := make(map[T]struct{})
+type FilterFn[T any] TestFn[T]
+type IDFn[T any, V utype.ID] func(arr []T, i int) V
+
+func IDValue[T utype.ID](arr []T, i int) T { return arr[i] }
+
+func Unique[T comparable, V utype.ID](id IDFn[T, V]) FilterFn[T] {
+	m := make(map[V]struct{})
 
 	return func(arr []T, i int) bool {
-		if _, ok := m[arr[i]]; ok {
+		vID := id(arr, i)
+		if _, ok := m[vID]; ok {
 			return false
 		}
 
-		m[arr[i]] = struct{}{}
+		m[vID] = struct{}{}
 		return true
 	}
 }
 
-func Intersection[T comparable](arr []T) FilterFn[T] {
+func Intersection[T comparable, V utype.ID](arr []T, id IDFn[T, V]) FilterFn[T] {
 	if len(arr) == 0 {
 		return none[T]()
 	}
 
-	m := make(map[T]struct{}, len(arr))
-	for _, item := range arr {
-		m[item] = struct{}{}
+	m := make(map[V]struct{}, len(arr))
+	for i := range arr {
+		m[id(arr, i)] = struct{}{}
 	}
 
 	return func(arr []T, i int) bool {
-		_, ok := m[arr[i]]
+		_, ok := m[id(arr, i)]
 		return ok
 	}
 }
