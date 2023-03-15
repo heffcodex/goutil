@@ -1,8 +1,11 @@
 package utime
 
 import (
+	"database/sql"
+	"database/sql/driver"
 	"encoding"
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -10,6 +13,7 @@ import (
 
 var (
 	MarshalFormat = time.RFC3339
+	SQLFormat     = time.RFC3339Nano
 	StartOfWeek   = time.Monday
 )
 
@@ -21,20 +25,27 @@ func LocalWeekday(startOfWeek time.Weekday, wd time.Weekday) int {
 	return int(7+wd-startOfWeek) % 7
 }
 
-var (
-	_ json.Marshaler             = (*Time)(nil)
-	_ json.Unmarshaler           = (*Time)(nil)
-	_ encoding.TextMarshaler     = (*Time)(nil)
-	_ encoding.TextUnmarshaler   = (*Time)(nil)
-	_ encoding.BinaryMarshaler   = (*Time)(nil)
-	_ encoding.BinaryUnmarshaler = (*Time)(nil)
-)
+type iTime interface {
+	json.Marshaler
+	json.Unmarshaler
+	encoding.TextMarshaler
+	encoding.TextUnmarshaler
+	encoding.BinaryMarshaler
+	encoding.BinaryUnmarshaler
+	driver.Valuer
+	sql.Scanner
+
+	Std() time.Time
+	PB() *timestamppb.Timestamp
+}
+
+var _ iTime = (*Time)(nil)
 
 type Time struct{ time.Time }
 
 // constructors:
 
-func FromStdTime(t time.Time) Time {
+func FromStd(t time.Time) Time {
 	return Time{Time: t}
 }
 
@@ -52,7 +63,7 @@ func Date(year int, month time.Month, day, hour, min, sec, nsec int, loc *time.L
 
 // converters:
 
-func (t Time) StdTime() time.Time {
+func (t Time) Std() time.Time {
 	return t.Time
 }
 
@@ -124,6 +135,44 @@ func (t *Time) UnmarshalBinary(data []byte) error {
 	return nil
 }
 
+func (t Time) Value() (driver.Value, error) {
+	if t.IsZero() {
+		return nil, nil
+	}
+
+	return t.Format(SQLFormat), nil
+}
+
+func (t *Time) Scan(src any) error {
+	var stdt time.Time
+	var err error
+
+	switch src := src.(type) {
+	case time.Time:
+		stdt = src
+	case string:
+		stdt, err = time.ParseInLocation(SQLFormat, src, time.UTC)
+	case []byte:
+		stdt, err = time.ParseInLocation(SQLFormat, string(src), time.UTC)
+	case nil:
+		// do nothing
+	default:
+		err = fmt.Errorf("unsupported data type: %T", src)
+	}
+
+	if err != nil {
+		return err
+	}
+
+	if stdt.IsZero() {
+		t.Time = time.Time{}
+	} else {
+		t.Time = stdt.Local()
+	}
+
+	return nil
+}
+
 // time.Time wrappers:
 
 func (t Time) After(u Time) bool {
@@ -183,12 +232,12 @@ func (t Time) Between(start, end Time) bool {
 
 func (t Time) StartOfDay() Time {
 	year, month, day := t.Date()
-	return FromStdTime(time.Date(year, month, day, 0, 0, 0, 0, t.Location()))
+	return FromStd(time.Date(year, month, day, 0, 0, 0, 0, t.Location()))
 }
 
 func (t Time) EndOfDay() Time {
 	year, month, day := t.Date()
-	return FromStdTime(time.Date(year, month, day, 23, 59, 59, int(time.Second-time.Nanosecond), t.Location()))
+	return FromStd(time.Date(year, month, day, 23, 59, 59, int(time.Second-time.Nanosecond), t.Location()))
 }
 
 func (t Time) LocalWeekday() int {

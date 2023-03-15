@@ -36,8 +36,8 @@ func TestLocalWeekday(t *testing.T) {
 	require.Equal(t, 6, LocalWeekday(sow, time.Sunday))
 }
 
-func TestFromStdTime(t *testing.T) {
-	ut := FromStdTime(testTime())
+func TestFromStd(t *testing.T) {
+	ut := FromStd(testTime())
 	require.Equal(t, testTime(), ut.Time)
 }
 
@@ -63,11 +63,11 @@ func TestDate(t *testing.T) {
 	require.Equal(t, tt, ut.Time)
 }
 
-func TestTime_StdTime(t *testing.T) {
+func TestTime_Std(t *testing.T) {
 	tt := testTime()
 	ut := Time{Time: tt}
 
-	require.Equal(t, tt, ut.StdTime())
+	require.Equal(t, tt, ut.Std())
 }
 
 func TestTime_PB(t *testing.T) {
@@ -223,6 +223,37 @@ func TestTime_UnmarshalBinary(t *testing.T) {
 			err = ut.UnmarshalBinary(nowBin)
 			require.NoError(t, err)
 
+			require.True(t, ut.IsZero())
+		},
+	)
+}
+
+func TestTime_Value(t *testing.T) {
+	tt := testTime()
+	ut := Time{Time: tt}
+
+	val, err := ut.Value()
+	require.NoError(t, err)
+	require.NoError(t, ut.Scan(val))
+	require.Equal(t, tt.Local(), ut.Time)
+}
+
+func TestTime_Scan(t *testing.T) {
+	ut := Time{}
+
+	t.Run(
+		"time", func(t *testing.T) {
+			tt := testTime()
+			err := ut.Scan(tt)
+			require.NoError(t, err)
+			require.Equal(t, tt.Local(), ut.Time)
+		},
+	)
+
+	t.Run(
+		"zero", func(t *testing.T) {
+			err := ut.Scan(nil)
+			require.NoError(t, err)
 			require.True(t, ut.IsZero())
 		},
 	)
