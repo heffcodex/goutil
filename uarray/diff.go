@@ -2,81 +2,126 @@ package uarray
 
 import "github.com/heffcodex/goutil/v2/umath"
 
-type CmpFn[T any] func(a, d T) bool
+// KeyFn provides a way to extract comparable keys from slice elements.
+// For example, it may be ID of the struct or even the element itself (see KeyValue) for primitive types,
+// but it is important to keep these keys short to avoid memory bloat.
+type KeyFn[T any, K comparable] func(a T) K
 
-func CmpValue[T comparable](a, d T) bool {
-	return a == d
+// KeyValue is a KeyFn that uses provided value itself as a key.
+func KeyValue[T comparable](v T) T {
+	return v
 }
 
-func Diff[T any](actual, desired []T, cmp CmpFn[T]) (eq, add, rm []T) {
+// Diff works just like DiffIndex and on a base of it, but returns the resulting slice elements of the difference.
+// See the corresponding function for more details.
+func Diff[T any, K comparable](actual, desired []T, keyFn KeyFn[T, K]) (eq, rm, add []T) {
 	if len(actual) == 0 {
-		return nil, desired, nil
+		return nil, nil, desired
 	}
 
 	if len(desired) == 0 {
-		return nil, nil, actual
+		return nil, actual, nil
 	}
 
-	eq = make([]T, 0, umath.Max(len(desired), len(actual)))
-	add = make([]T, 0, len(desired))
-	rm = make([]T, 0, len(actual))
+	iEq, iRm, iAdd := DiffIndex(actual, desired, keyFn)
 
-	skipActualIdx := make(map[int]struct{}, len(actual))
-	skipDesiredIdx := make(map[int]struct{}, len(desired))
+	eq = make([]T, len(iEq))
+	rm = make([]T, len(iRm))
+	add = make([]T, len(iAdd))
 
-	for ia := range actual {
-		if _, ok := skipActualIdx[ia]; ok {
+	maxLen := umath.Max(len(eq), len(rm), len(add))
+
+	for i := 0; i < maxLen; i++ {
+		if len(eq) > i {
+			eq[i] = actual[iEq[i]]
+		}
+
+		if len(rm) > i {
+			rm[i] = actual[iRm[i]]
+		}
+
+		if len(add) > i {
+			add[i] = desired[iAdd[i]]
+		}
+	}
+
+	return eq, rm, add
+}
+
+// DiffIndex returns indices of the elements against the provided `actual` and `desired`:
+// `eq` - the indices of the elements of `actual` slice that are _equal_ to the desired (i.e. may stay at their current place).
+// `rm` - the indices of the elements of `actual` slice that are _not equal_ to the desired (i.e. needs to be removed from `actual`).
+// `add` - the indices of the elements of `desired` slice that are _not equal_ to the actual (i.e. needs to be appended to `actual`).
+func DiffIndex[T any, K comparable](actual, desired []T, keyFn KeyFn[T, K]) (eq, rm, add []int) {
+	if len(actual) == 0 {
+		return nil, nil, series(len(desired))
+	}
+
+	if len(desired) == 0 {
+		return nil, series(len(actual)), nil
+	}
+
+	eq = make([]int, 0, umath.Min(len(desired), len(actual)))
+	rm = make([]int, 0, len(actual))
+	add = make([]int, 0, len(desired))
+
+	actualKeys := make([]*K, len(actual))
+	actualKIdxSame := make(map[K][]int, len(actual))
+	desiredKIdxSame := make(map[K][]int, len(desired))
+
+	for i := range actual {
+		k := keyFn(actual[i])
+
+		actualKeys[i] = &k
+		actualKIdxSame[k] = append(actualKIdxSame[k], i)
+	}
+
+	for i := range desired {
+		k := keyFn(desired[i])
+		sameActual := actualKIdxSame[k]
+		sameDesired := append(desiredKIdxSame[k], i)
+
+		if len(sameActual) < len(sameDesired) {
+			add = append(add, i)
+		}
+
+		desiredKIdxSame[k] = sameDesired
+	}
+
+	for i := range actual {
+		pk := actualKeys[i]
+
+		sameActual, ok := actualKIdxSame[*pk]
+		if !ok {
 			continue
 		}
 
-		found := false
+		sameDesired := desiredKIdxSame[*pk]
 
-		for id := range desired {
-			if _, ok := skipDesiredIdx[id]; ok {
-				continue
-			}
-
-			if cmp(actual[ia], desired[id]) {
-				found = true
-				eq = append(eq, desired[id])
-				skipActualIdx[ia] = struct{}{}
-				skipDesiredIdx[id] = struct{}{}
-
-				break
-			}
+		if len(sameActual) <= len(sameDesired) {
+			eq = append(eq, sameActual...)
+		} else {
+			eq = append(eq, sameActual[:len(sameDesired)]...)
+			rm = append(rm, sameActual[len(sameDesired):]...)
 		}
 
-		if !found {
-			rm = append(rm, actual[ia])
-		}
+		delete(actualKIdxSame, *pk)
 	}
 
-	for id := range desired {
-		if _, ok := skipDesiredIdx[id]; ok {
-			continue
-		}
+	return eq, rm, add
+}
 
-		found := false
-
-		for ia := range actual {
-			if _, ok := skipActualIdx[ia]; ok {
-				continue
-			}
-
-			if cmp(actual[ia], desired[id]) {
-				found = true
-				eq = append(add, desired[id])
-				skipActualIdx[ia] = struct{}{}
-				skipDesiredIdx[id] = struct{}{}
-
-				break
-			}
-		}
-
-		if !found {
-			add = append(add, desired[id])
-		}
+// series returns a slice of ints filled with values equal to its index.
+func series(n int) []int {
+	if n == 0 {
+		return nil
 	}
 
-	return eq, add, rm
+	s := make([]int, n)
+
+	for i := 0; i < n; i++ {
+		s[i] = i
+	}
+
+	return s
 }
