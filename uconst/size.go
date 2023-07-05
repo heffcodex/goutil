@@ -1,5 +1,6 @@
 package uconst
 
+// Some size constants.
 const (
 	Bit  = 1
 	KBit = 1024 * Bit

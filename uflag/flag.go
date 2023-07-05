@@ -1,5 +1,6 @@
 package uflag
 
+// Order flag.
 type Order bool
 
 const (
