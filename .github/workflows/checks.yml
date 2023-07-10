@@ -1,0 +1,36 @@
+name: Checks
+
+on:
+  push:
+    branches:
+      - master
+      - main
+    tags:
+      - v*
+  pull_request:
+
+jobs:
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
+        with:
+          cache: false
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: v1.53
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
+        with:
+          cache: false
+      - name: test
+        run: go test -race -coverprofile=coverage.out -covermode=atomic ./...
+      - name: codecov
+        uses: codecov/codecov-action@v3

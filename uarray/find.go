@@ -2,7 +2,7 @@ package uarray
 
 const IdxNotFound = -1
 
-// MatchFn returns true if the element is found in the array
+// MatchFn returns true if the element is found in the array.
 type MatchFn[T any] TestFn[T]
 
 // Value returns MatchFn to match element by the provided value.

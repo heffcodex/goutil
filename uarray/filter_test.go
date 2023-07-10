@@ -8,7 +8,8 @@ import (
 
 func TestFilter(t *testing.T) {
 	arr := []int{1, 1, 2, 3, 3, 4, 5, 5}
-	res := make([]int, 0, len(arr))
+
+	var res []int
 
 	res = Filter(arr, Unique[int](IDValue[int]))
 	require.Equal(t, []int{1, 2, 3, 4, 5}, res)

@@ -15,17 +15,16 @@ func Min[T utype.Real](v ...T) T {
 		panic("at least 2 arguments required")
 	}
 
-	m := min(v[0], v[1])
+	m := minTwo(v[0], v[1])
 
 	for i := 2; i < len(v); i++ {
-		m = min(m, v[i])
+		m = minTwo(m, v[i])
 	}
 
 	return m
 }
 
-// min for two values
-func min[T utype.Real](a, b T) T {
+func minTwo[T utype.Real](a, b T) T {
 	if a < b {
 		return a
 	}
@@ -58,17 +57,16 @@ func Max[T utype.Real](v ...T) T {
 		panic("at least 2 arguments required")
 	}
 
-	m := max(v[0], v[1])
+	m := maxTwo(v[0], v[1])
 
 	for i := 2; i < len(v); i++ {
-		m = max(m, v[i])
+		m = maxTwo(m, v[i])
 	}
 
 	return m
 }
 
-// max for two values
-func max[T utype.Real](a, b T) T {
+func maxTwo[T utype.Real](a, b T) T {
 	if a > b {
 		return a
 	}

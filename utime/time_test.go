@@ -5,9 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"google.golang.org/protobuf/types/known/timestamppb"
-
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func testTime() time.Time {
@@ -79,6 +78,8 @@ func TestTime_PB(t *testing.T) {
 
 func TestTime_MarshalJSON(t *testing.T) {
 	forTime := func(t *testing.T, tt time.Time) {
+		t.Helper()
+
 		s := struct {
 			T Time `json:"t"`
 		}{

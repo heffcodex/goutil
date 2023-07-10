@@ -98,7 +98,10 @@ func TestMap_Keys(t *testing.T) {
 	m.Map.Store(2, 2)
 
 	keys := m.Keys()
-	require.EqualValues(t, []int{1, 2}, keys)
+
+	require.Len(t, keys, 2)
+	require.Contains(t, keys, 1)
+	require.Contains(t, keys, 2)
 }
 
 func TestMap_Values(t *testing.T) {
@@ -108,5 +111,7 @@ func TestMap_Values(t *testing.T) {
 	m.Map.Store(2, 2)
 
 	values := m.Values()
-	require.EqualValues(t, []int{1, 2}, values)
+	require.Len(t, values, 2)
+	require.Contains(t, values, 1)
+	require.Contains(t, values, 2)
 }

@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestDiff(t *testing.T) {
+func TestDiff(t *testing.T) { //nolint: dupl // ignore for test
 	type test struct {
 		name                    string
 		actual, desired         []int
@@ -75,7 +75,7 @@ func TestDiff(t *testing.T) {
 	}
 }
 
-func TestDiffIndex(t *testing.T) {
+func TestDiffIndex(t *testing.T) { //nolint: dupl // ignore for test
 	type test struct {
 		name                    string
 		actual, desired         []string

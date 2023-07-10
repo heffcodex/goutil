@@ -3,9 +3,9 @@ package uarray
 import (
 	"testing"
 
-	"github.com/heffcodex/goutil/v2/uflag"
-
 	"github.com/stretchr/testify/require"
+
+	"github.com/heffcodex/goutil/v2/uflag"
 )
 
 func TestCluster(t *testing.T) {

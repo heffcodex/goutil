@@ -16,7 +16,8 @@ func (m *Map[K, V]) Load(key K) (value V, ok bool) {
 	}
 
 	value, ok = _value.(V)
-	return
+
+	return value, ok
 }
 
 // Store sets the value for a key.

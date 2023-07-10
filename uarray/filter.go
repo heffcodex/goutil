@@ -24,6 +24,7 @@ func Unique[T comparable, V utype.ID](id IDFn[T, V]) FilterFn[T] {
 		}
 
 		m[vID] = struct{}{}
+
 		return true
 	}
 }

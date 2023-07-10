@@ -29,8 +29,8 @@ func EndOfWeek(startOfWeek time.Weekday) time.Weekday {
 }
 
 // LocalWeekday returns the circular-shifted weekday number [0; 6] according to the given `startOfWeek`.
-func LocalWeekday(startOfWeek time.Weekday, wd time.Weekday) int {
-	return int(7+wd-startOfWeek) % 7
+func LocalWeekday(startOfWeek, day time.Weekday) int {
+	return int(7+day-startOfWeek) % 7
 }
 
 type iTime interface {
@@ -113,6 +113,7 @@ func (t *Time) UnmarshalJSON(data []byte) error {
 	}
 
 	t.Time = _t.Local()
+
 	return nil
 }
 
@@ -139,6 +140,7 @@ func (t *Time) UnmarshalText(text []byte) error {
 	}
 
 	t.Time = _t.Local()
+
 	return nil
 }
 
@@ -156,6 +158,7 @@ func (t *Time) UnmarshalBinary(data []byte) error {
 	}
 
 	t.Time = _t.Local()
+
 	return nil
 }
 
@@ -171,16 +174,18 @@ func (t Time) Value() (driver.Value, error) {
 // Scan implements the sql.Scanner interface for the defined SQLFormat global variable.
 // Scans the local time.
 func (t *Time) Scan(src any) error {
-	var stdt time.Time
-	var err error
+	var (
+		stdT time.Time
+		err  error
+	)
 
-	switch src := src.(type) {
+	switch srcT := src.(type) {
 	case time.Time:
-		stdt = src
+		stdT = srcT
 	case string:
-		stdt, err = time.ParseInLocation(SQLFormat, src, time.UTC)
+		stdT, err = time.ParseInLocation(SQLFormat, srcT, time.UTC)
 	case []byte:
-		stdt, err = time.ParseInLocation(SQLFormat, string(src), time.UTC)
+		stdT, err = time.ParseInLocation(SQLFormat, string(srcT), time.UTC)
 	case nil:
 		// do nothing
 	default:
@@ -191,10 +196,10 @@ func (t *Time) Scan(src any) error {
 		return err
 	}
 
-	if stdt.IsZero() {
+	if stdT.IsZero() {
 		t.Time = time.Time{}
 	} else {
-		t.Time = stdt.Local()
+		t.Time = stdT.Local()
 	}
 
 	return nil
@@ -311,40 +316,40 @@ func (t Time) EndOfMonth() Time {
 
 // RuMonthName returns the name of month in Russian.
 func (t *Time) RuMonthName() string {
-	var longMonthNamesRuRU = map[string]string{
-		"January":   "Январь",
-		"February":  "Февраль",
-		"March":     "Март",
-		"April":     "Апрель",
-		"May":       "Май",
-		"June":      "Июнь",
-		"July":      "Июль",
-		"August":    "Август",
-		"September": "Сентябрь",
-		"October":   "Октябрь",
-		"November":  "Ноябрь",
-		"December":  "Декабрь",
+	longMonthNamesRuRU := map[time.Month]string{
+		time.January:   "Январь",
+		time.February:  "Февраль",
+		time.March:     "Март",
+		time.April:     "Апрель",
+		time.May:       "Май",
+		time.June:      "Июнь",
+		time.July:      "Июль",
+		time.August:    "Август",
+		time.September: "Сентябрь",
+		time.October:   "Октябрь",
+		time.November:  "Ноябрь",
+		time.December:  "Декабрь",
 	}
 
-	return longMonthNamesRuRU[t.Format("January")]
+	return longMonthNamesRuRU[t.Month()]
 }
 
 // RuMonthNamePrepositional returns the name of month in Russian in prepositional case.
 func (t *Time) RuMonthNamePrepositional() string {
-	var longMonthNamesRuRU = map[string]string{
-		"January":   "Январе",
-		"February":  "Феврале",
-		"March":     "Марте",
-		"April":     "Апреле",
-		"May":       "Мае",
-		"June":      "Июне",
-		"July":      "Июле",
-		"August":    "Августе",
-		"September": "Сентябре",
-		"October":   "Октябре",
-		"November":  "Ноябре",
-		"December":  "Декабре",
+	longMonthNamesRuRU := map[time.Month]string{
+		time.January:   "Январе",
+		time.February:  "Феврале",
+		time.March:     "Марте",
+		time.April:     "Апреле",
+		time.May:       "Мае",
+		time.June:      "Июне",
+		time.July:      "Июле",
+		time.August:    "Августе",
+		time.September: "Сентябре",
+		time.October:   "Октябре",
+		time.November:  "Ноябре",
+		time.December:  "Декабре",
 	}
 
-	return longMonthNamesRuRU[t.Format("January")]
+	return longMonthNamesRuRU[t.Month()]
 }

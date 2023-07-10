@@ -1,12 +1,12 @@
 package umime
 
 import (
+	"errors"
 	"io"
 	"path"
 	"strings"
 
 	"github.com/gabriel-vasile/mimetype"
-	"github.com/pkg/errors"
 )
 
 var ErrInvalidMIME = errors.New("invalid MIME")
