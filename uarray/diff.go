@@ -1,7 +1,5 @@
 package uarray
 
-import "github.com/heffcodex/goutil/v2/umath"
-
 // KeyFn provides a way to extract comparable keys from slice elements.
 // For example, it may be ID of the struct or even the element itself (see KeyValue) for primitive types,
 // but it is important to keep these keys short to avoid memory bloat.
@@ -29,7 +27,7 @@ func Diff[T any, K comparable](actual, desired []T, keyFn KeyFn[T, K]) (eq, rm, 
 	rm = make([]T, len(iRm))
 	add = make([]T, len(iAdd))
 
-	maxLen := umath.Max(len(eq), len(rm), len(add))
+	maxLen := max(len(eq), len(rm), len(add))
 
 	for i := 0; i < maxLen; i++ {
 		if len(eq) > i {
@@ -61,7 +59,7 @@ func DiffIndex[T any, K comparable](actual, desired []T, keyFn KeyFn[T, K]) (eq,
 		return nil, series(len(actual)), nil
 	}
 
-	eq = make([]int, 0, umath.Min(len(desired), len(actual)))
+	eq = make([]int, 0, min(len(desired), len(actual)))
 	rm = make([]int, 0, len(actual))
 	add = make([]int, 0, len(desired))
 

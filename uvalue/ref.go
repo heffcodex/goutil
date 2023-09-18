@@ -15,3 +15,12 @@ func RefOrNil[T comparable](v T) *T {
 
 	return Ref(v)
 }
+
+// CopyRef returns a pointer to a copy (!) the value pointed by v or nil if v is nil.
+func CopyRef[T any](v *T) *T {
+	if v == nil {
+		return nil
+	}
+
+	return Ref(*v)
+}
