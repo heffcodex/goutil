@@ -74,6 +74,11 @@ func Date(year int, month time.Month, day, hour, min, sec, nsec int, loc *time.L
 	return FromStd(time.Date(year, month, day, hour, min, sec, nsec, loc))
 }
 
+// Unix constructs a Time from the given unix epoch time.
+func Unix(sec, nsec int64) Time {
+	return FromStd(time.Unix(sec, nsec))
+}
+
 // converters:
 
 // Std converts a Time to a standard time.Time.

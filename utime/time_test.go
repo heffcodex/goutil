@@ -9,8 +9,12 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
+const (
+	testNsec = 7
+)
+
 func testTime() time.Time {
-	return time.Date(2022, 2, 3, 4, 5, 6, 7, time.UTC) // 3 Feb 2022 04:05:06.000000007 UTC
+	return time.Date(2022, 2, 3, 4, 5, 6, testNsec, time.UTC) // 3 Feb 2022 04:05:06.000000007 UTC
 }
 
 func TestEndOfWeek(t *testing.T) {
@@ -58,6 +62,13 @@ func TestNow(t *testing.T) {
 func TestDate(t *testing.T) {
 	tt := testTime()
 	ut := Date(tt.Year(), tt.Month(), tt.Day(), tt.Hour(), tt.Minute(), tt.Second(), tt.Nanosecond(), tt.Location())
+
+	require.Equal(t, tt, ut.Time)
+}
+
+func TestUnix(t *testing.T) {
+	tt := testTime()
+	ut := Unix(tt.Unix(), testNsec).UTC()
 
 	require.Equal(t, tt, ut.Time)
 }

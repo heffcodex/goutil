@@ -483,14 +483,8 @@ linters-settings:
     allow-separated-leading-comment: false
     allow-cuddle-declarations: false
 
-    allow-cuddle-with-calls:
-      - "Lock"
-      - "RLock"
-      - "Store"
-      - "WaitInterrupt"
-    allow-cuddle-with-rhs:
-      - "Unlock"
-      - "RUnlock"
+    allow-cuddle-with-calls: []
+    allow-cuddle-with-rhs: []
 
     force-err-cuddling: false
     error-variable-names:
