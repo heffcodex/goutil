@@ -26,7 +26,7 @@ func (m *Map[K, V]) Store(key K, value V) { m.Map.Store(key, value) }
 // LoadOrStore returns the existing value for the key if present, otherwise storing the given one.
 func (m *Map[K, V]) LoadOrStore(key K, value V) (actual V, loaded bool) {
 	_actual, _loaded := m.Map.LoadOrStore(key, value)
-	return _actual.(V), _loaded
+	return _actual.(V), _loaded //nolint: revive // unchecked-type-assertion: it's ok to panic here
 }
 
 // Delete deletes the given keys from the map.

@@ -16,7 +16,7 @@ func TestCluster(t *testing.T) {
 		func(item int) int { return item % 3 },
 		func(item int) int { return item % 2 },
 	)
-	require.Equal(t, 3, len(cluster))
+	require.Len(t, cluster, 3)
 	require.ElementsMatch(t, []int{2, 3, 4, 6, 8, 9, 10}, cluster[0])
 	require.ElementsMatch(t, []int{1, 3, 4, 5, 7, 9, 10}, cluster[1])
 	require.ElementsMatch(t, []int{2, 5, 8}, cluster[2])

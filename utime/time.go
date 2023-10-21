@@ -227,6 +227,11 @@ func (t Time) Equal(u Time) bool {
 	return t.Time.Equal(u.Time)
 }
 
+// Compare wraps the standard function.
+func (t Time) Compare(u Time) int {
+	return t.Time.Compare(u.Time)
+}
+
 // AddDate wraps the standard function.
 func (t Time) AddDate(years, months, days int) Time {
 	return FromStd(t.Time.AddDate(years, months, days))

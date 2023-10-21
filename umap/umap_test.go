@@ -11,7 +11,7 @@ func TestFromArray(t *testing.T) {
 		return item
 	})
 
-	assert.Equal(t, 5, len(m))
+	assert.Len(t, m, 5)
 	assert.Equal(t, 1, m[1])
 	assert.Equal(t, 2, m[2])
 	assert.Equal(t, 3, m[3])
