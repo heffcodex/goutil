@@ -151,3 +151,37 @@ func TestInterval_Contains(t *testing.T) {
 		})
 	}
 }
+
+func TestInterval_Inclusive(t *testing.T) {
+	type test struct {
+		in         Interval
+		start, end Time
+	}
+
+	now := Now()
+
+	tests := []test{
+		{
+			in:    Interval{},
+			start: Time{}, end: Time{},
+		},
+		{
+			in:    Interval{StartTime: now, EndTime: now, InclusiveEnd: false},
+			start: now, end: now.Add(-time.Nanosecond),
+		},
+		{
+			in:    Interval{StartTime: now, EndTime: now, InclusiveEnd: true},
+			start: now, end: now,
+		},
+	}
+
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			out := tt.in.Inclusive()
+
+			assert.True(t, out.InclusiveEnd)
+			assert.Equal(t, tt.start, out.StartTime)
+			assert.Equal(t, tt.end, out.EndTime)
+		})
+	}
+}

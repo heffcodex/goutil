@@ -44,3 +44,21 @@ func (i Interval) IsValid() bool {
 func (i Interval) Contains(t Time) bool {
 	return i.IsValid() && i.StartTime.Compare(t) < 1 && ((i.InclusiveEnd && i.EndTime.Compare(t) >= 0) || i.EndTime.Compare(t) > 0)
 }
+
+// Inclusive returns a new interval ensuring that InclusiveEnd flag set to true and EndTime corrected respectively if needed.
+func (i Interval) Inclusive() Interval {
+	if i.InclusiveEnd {
+		return i
+	}
+
+	endTime := i.EndTime
+	if !endTime.IsZero() {
+		endTime = endTime.Add(-time.Nanosecond)
+	}
+
+	return Interval{
+		StartTime:    i.StartTime,
+		EndTime:      endTime,
+		InclusiveEnd: true,
+	}
+}
