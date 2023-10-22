@@ -112,6 +112,13 @@ func TestInterval_IsValid(t *testing.T) {
 	}
 }
 
+func TestInterval_IsZero(t *testing.T) {
+	assert.True(t, Interval{}.IsZero())
+	assert.False(t, Interval{StartTime: Now()}.IsZero())
+	assert.False(t, Interval{EndTime: Now()}.IsZero())
+	assert.False(t, Interval{StartTime: Now(), EndTime: Now()}.IsZero())
+}
+
 func TestInterval_Contains(t *testing.T) {
 	type test struct {
 		start, end, v Time

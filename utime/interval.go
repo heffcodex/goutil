@@ -40,6 +40,11 @@ func (i Interval) IsValid() bool {
 	return (i.InclusiveEnd && i.StartTime.Compare(i.EndTime) <= 0) || i.StartTime.Compare(i.EndTime) < 0
 }
 
+// IsZero checks if the interval both StartTime and EndTime are zero.
+func (i Interval) IsZero() bool {
+	return i.StartTime.IsZero() && i.EndTime.IsZero()
+}
+
 // Contains returns true if the given Time t is contained in the interval.
 func (i Interval) Contains(t Time) bool {
 	return i.IsValid() && i.StartTime.Compare(t) < 1 && ((i.InclusiveEnd && i.EndTime.Compare(t) >= 0) || i.EndTime.Compare(t) > 0)
