@@ -25,7 +25,7 @@ func TestIntervalFromPB(t *testing.T) {
 	assert.True(t, end.Equal(i.EndTime.Time))
 }
 
-func TestInterval_PB(t *testing.T) {
+func TestInclusiveInterval_PB(t *testing.T) {
 	start := Now()
 	end := start.Add(time.Second)
 
@@ -42,71 +42,89 @@ func TestInterval_PB(t *testing.T) {
 
 	for i, tt := range tests {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
-			t.Run("inclusiveEnd", func(t *testing.T) {
-				i := Interval{
-					StartTime:    tt.start,
-					EndTime:      tt.end,
-					InclusiveEnd: true,
-				}
+			pb := InclusiveInterval{StartTime: tt.start, EndTime: tt.end}.PB()
 
-				pb := i.PB()
+			wantEnd := tt.end
+			if !wantEnd.IsZero() {
+				wantEnd = wantEnd.Add(time.Nanosecond)
+			}
 
-				wantEnd := tt.end
-				if !tt.end.IsZero() {
-					wantEnd = tt.end.Add(time.Nanosecond)
-				}
-
-				assert.Equal(t, tt.start.PB(), pb.GetStartTime())
-				assert.Equal(t, wantEnd.PB(), pb.GetEndTime())
-			})
-
-			t.Run("exclusiveEnd", func(t *testing.T) {
-				i := Interval{
-					StartTime:    tt.start,
-					EndTime:      tt.end,
-					InclusiveEnd: false,
-				}
-
-				pb := i.PB()
-
-				assert.Equal(t, tt.start.PB(), pb.GetStartTime())
-				assert.Equal(t, tt.end.PB(), pb.GetEndTime())
-			})
+			assert.Equal(t, tt.start.PB(), pb.GetStartTime())
+			assert.Equal(t, wantEnd.PB(), pb.GetEndTime())
 		})
 	}
 }
 
-func TestInterval_IsValid(t *testing.T) {
+func TestExclusiveInterval_PB(t *testing.T) {
+	start := Now()
+	end := start.Add(time.Second)
+
 	type test struct {
 		start, end Time
-		ie, ok     bool
+	}
+
+	tests := []test{
+		{},
+		{start: start},
+		{end: end},
+		{start: start, end: end},
+	}
+
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			pb := ExclusiveInterval{StartTime: tt.start, EndTime: tt.end}.PB()
+
+			assert.Equal(t, tt.start.PB(), pb.GetStartTime())
+			assert.Equal(t, tt.end.PB(), pb.GetEndTime())
+		})
+	}
+}
+
+func TestInclusiveInterval_IsValid(t *testing.T) {
+	type test struct {
+		start, end Time
+		ok         bool
 	}
 
 	now := Now()
 
 	tests := []test{
-		{ie: false, ok: false},
-		{ie: true, ok: true},
-		{start: now, ie: false, ok: false},
-		{start: now, ie: true, ok: false},
-		{end: now, ie: false, ok: true},
-		{end: now, ie: true, ok: true},
-		{start: now, end: now, ie: false, ok: false},
-		{start: now, end: now, ie: true, ok: true},
-		{start: now.Add(time.Nanosecond), end: now, ie: false, ok: false},
-		{start: now.Add(time.Nanosecond), end: now, ie: false, ok: false},
-		{start: now, end: now.Add(time.Nanosecond), ie: false, ok: true},
-		{start: now, end: now.Add(time.Nanosecond), ie: true, ok: true},
+		{ok: true},
+		{start: now, ok: false},
+		{end: now, ok: true},
+		{start: now, end: now, ok: true},
+		{start: now.Add(time.Nanosecond), end: now, ok: false},
+		{start: now, end: now.Add(time.Nanosecond), ok: true},
 	}
 
 	for i, tt := range tests {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
-			i := Interval{
-				StartTime:    tt.start,
-				EndTime:      tt.end,
-				InclusiveEnd: tt.ie,
-			}
+			i := InclusiveInterval{StartTime: tt.start, EndTime: tt.end}
+			assert.Equal(t, tt.ok, i.IsValid())
+		})
+	}
+}
 
+func TestExclusiveInterval_IsValid(t *testing.T) {
+	type test struct {
+		start, end Time
+		ok         bool
+	}
+
+	now := Now()
+
+	tests := []test{
+		{ok: false},
+		{start: now, ok: false},
+		{end: now, ok: true},
+		{start: now, end: now, ok: false},
+		{start: now.Add(time.Nanosecond), end: now, ok: false},
+		{start: now, end: now.Add(time.Nanosecond), ok: true},
+	}
+
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			i := ExclusiveInterval{StartTime: tt.start, EndTime: tt.end}
 			assert.Equal(t, tt.ok, i.IsValid())
 		})
 	}
@@ -119,49 +137,79 @@ func TestInterval_IsZero(t *testing.T) {
 	assert.False(t, Interval{StartTime: Now(), EndTime: Now()}.IsZero())
 }
 
-func TestInterval_Contains(t *testing.T) {
+func TestInclusiveInterval_IsZero(t *testing.T) {
+	assert.True(t, InclusiveInterval{}.IsZero())
+	assert.False(t, InclusiveInterval{StartTime: Now()}.IsZero())
+	assert.False(t, InclusiveInterval{EndTime: Now()}.IsZero())
+	assert.False(t, InclusiveInterval{StartTime: Now(), EndTime: Now()}.IsZero())
+}
+
+func TestExclusiveInterval_IsZero(t *testing.T) {
+	assert.True(t, ExclusiveInterval{}.IsZero())
+	assert.False(t, ExclusiveInterval{StartTime: Now()}.IsZero())
+	assert.False(t, ExclusiveInterval{EndTime: Now()}.IsZero())
+	assert.False(t, ExclusiveInterval{StartTime: Now(), EndTime: Now()}.IsZero())
+}
+
+func TestInclusiveInterval_Contains(t *testing.T) { //nolint: dupl // it's ok
 	type test struct {
 		start, end, v Time
-		ie, ok        bool
+		ok            bool
 	}
 
 	now := Now()
 
 	tests := []test{
-		{start: Time{}, end: Time{}, v: Time{}, ie: true, ok: true},
-		{start: Time{}, end: Time{}, v: Time{}, ie: true, ok: true},
-		{start: Time{}, end: now, v: now, ie: true, ok: true},
-		{start: now, end: Time{}, v: Time{}, ie: false, ok: false},
-		{start: now, end: Time{}, v: Time{}, ie: true, ok: false},
-		{start: now, end: Time{}, v: now, ie: false, ok: false},
-		{start: now, end: Time{}, v: now, ie: true, ok: false},
-		{start: now, end: now, v: now, ie: true, ok: true},
-		{start: now, end: now, v: now, ie: false, ok: false},
-		{start: now, end: now, v: Time{}, ie: true, ok: false},
-		{start: now, end: now, v: Time{}, ie: false, ok: false},
-		{start: now, end: now, v: now.Add(time.Nanosecond), ie: false, ok: false},
-		{start: now, end: now, v: now.Add(time.Nanosecond), ie: true, ok: false},
-		{start: now, end: now, v: now.Add(-time.Nanosecond), ie: false, ok: false},
-		{start: now, end: now, v: now.Add(-time.Nanosecond), ie: true, ok: false},
-		{start: now.Add(-time.Second), end: now, v: now.Add(-time.Nanosecond), ie: true, ok: true},
+		{start: Time{}, end: Time{}, v: Time{}, ok: true},
+		{start: Time{}, end: now, v: now, ok: true},
+		{start: now, end: Time{}, v: Time{}, ok: false},
+		{start: now, end: Time{}, v: now, ok: false},
+		{start: now, end: now, v: now, ok: true},
+		{start: now, end: now, v: Time{}, ok: false},
+		{start: now, end: now, v: now.Add(time.Nanosecond), ok: false},
+		{start: now, end: now, v: now.Add(-time.Nanosecond), ok: false},
+		{start: now.Add(-time.Second), end: now, v: now.Add(-time.Nanosecond), ok: true},
 	}
 
 	for i, tt := range tests {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
-			i := Interval{
-				StartTime:    tt.start,
-				EndTime:      tt.end,
-				InclusiveEnd: tt.ie,
-			}
-
+			i := InclusiveInterval{StartTime: tt.start, EndTime: tt.end}
 			assert.Equal(t, tt.ok, i.Contains(tt.v))
 		})
 	}
 }
 
-func TestInterval_Inclusive(t *testing.T) {
+func TestExclusiveInterval_Contains(t *testing.T) { //nolint: dupl // it's ok
 	type test struct {
-		in         Interval
+		start, end, v Time
+		ok            bool
+	}
+
+	now := Now()
+
+	tests := []test{
+		{start: Time{}, end: Time{}, v: Time{}, ok: false},
+		{start: Time{}, end: now, v: now, ok: false},
+		{start: now, end: Time{}, v: Time{}, ok: false},
+		{start: now, end: Time{}, v: now, ok: false},
+		{start: now, end: now, v: now, ok: false},
+		{start: now, end: now, v: Time{}, ok: false},
+		{start: now, end: now, v: now.Add(time.Nanosecond), ok: false},
+		{start: now, end: now, v: now.Add(-time.Nanosecond), ok: false},
+		{start: now.Add(-time.Second), end: now, v: now.Add(-time.Nanosecond), ok: true},
+	}
+
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			i := ExclusiveInterval{StartTime: tt.start, EndTime: tt.end}
+			assert.Equal(t, tt.ok, i.Contains(tt.v))
+		})
+	}
+}
+
+func TestInclusiveInterval_Exclusive(t *testing.T) {
+	type test struct {
+		in         InclusiveInterval
 		start, end Time
 	}
 
@@ -169,16 +217,41 @@ func TestInterval_Inclusive(t *testing.T) {
 
 	tests := []test{
 		{
-			in:    Interval{},
+			in:    InclusiveInterval{},
 			start: Time{}, end: Time{},
 		},
 		{
-			in:    Interval{StartTime: now, EndTime: now, InclusiveEnd: false},
-			start: now, end: now.Add(-time.Nanosecond),
+			in:    InclusiveInterval{StartTime: now, EndTime: now},
+			start: now, end: now.Add(time.Nanosecond),
+		},
+	}
+
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			out := tt.in.Exclusive()
+
+			assert.Equal(t, tt.start, out.StartTime)
+			assert.Equal(t, tt.end, out.EndTime)
+		})
+	}
+}
+
+func TestExclusiveInterval_Inclusive(t *testing.T) {
+	type test struct {
+		in         ExclusiveInterval
+		start, end Time
+	}
+
+	now := Now()
+
+	tests := []test{
+		{
+			in:    ExclusiveInterval{},
+			start: Time{}, end: Time{},
 		},
 		{
-			in:    Interval{StartTime: now, EndTime: now, InclusiveEnd: true},
-			start: now, end: now,
+			in:    ExclusiveInterval{StartTime: now, EndTime: now},
+			start: now, end: now.Add(-time.Nanosecond),
 		},
 	}
 
@@ -186,7 +259,6 @@ func TestInterval_Inclusive(t *testing.T) {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			out := tt.in.Inclusive()
 
-			assert.True(t, out.InclusiveEnd)
 			assert.Equal(t, tt.start, out.StartTime)
 			assert.Equal(t, tt.end, out.EndTime)
 		})
