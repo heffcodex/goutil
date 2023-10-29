@@ -19,8 +19,8 @@ func testSlices() []testSlice {
 func TestMap(t *testing.T) {
 	t.Parallel()
 
-	res := Map(func(item int) int { return item * 2 }, testSlices()...)
-	require.Equal(t, []int{2, 4, 6, 8, 10, 12, 14, 16, 18}, res)
+	res := Map(testSlices()[0], func(item int) int { return item * 2 })
+	require.Equal(t, []int{2, 4, 6}, res)
 }
 
 func TestMerge(t *testing.T) {
