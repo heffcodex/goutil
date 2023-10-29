@@ -1,4 +1,4 @@
-package uarray
+package uslice
 
 import (
 	"testing"
@@ -7,6 +7,8 @@ import (
 )
 
 func TestDiff(t *testing.T) { //nolint: dupl // ignore for test
+	t.Parallel()
+
 	type test struct {
 		name                    string
 		actual, desired         []int
@@ -65,7 +67,11 @@ func TestDiff(t *testing.T) { //nolint: dupl // ignore for test
 	}
 
 	for _, test := range tests {
+		test := test
+
 		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
+
 			gotEq, gotRm, gotAdd := Diff(test.actual, test.desired, KeyValue[int])
 
 			assert.Equal(t, test.wantEq, gotEq)
@@ -76,6 +82,8 @@ func TestDiff(t *testing.T) { //nolint: dupl // ignore for test
 }
 
 func TestDiffIndex(t *testing.T) { //nolint: dupl // ignore for test
+	t.Parallel()
+
 	type test struct {
 		name                    string
 		actual, desired         []string
@@ -134,7 +142,11 @@ func TestDiffIndex(t *testing.T) { //nolint: dupl // ignore for test
 	}
 
 	for _, test := range tests {
+		test := test
+
 		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
+
 			gotEq, gotRm, gotAdd := DiffIndex(test.actual, test.desired, KeyValue[string])
 
 			assert.Equal(t, test.wantEq, gotEq)

@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -18,33 +19,41 @@ func testTime() time.Time {
 }
 
 func TestEndOfWeek(t *testing.T) {
-	require.Equal(t, time.Sunday, EndOfWeek(time.Monday))
-	require.Equal(t, time.Monday, EndOfWeek(time.Tuesday))
-	require.Equal(t, time.Tuesday, EndOfWeek(time.Wednesday))
-	require.Equal(t, time.Wednesday, EndOfWeek(time.Thursday))
-	require.Equal(t, time.Thursday, EndOfWeek(time.Friday))
-	require.Equal(t, time.Friday, EndOfWeek(time.Saturday))
-	require.Equal(t, time.Saturday, EndOfWeek(time.Sunday))
+	t.Parallel()
+
+	assert.Equal(t, time.Sunday, EndOfWeek(time.Monday))
+	assert.Equal(t, time.Monday, EndOfWeek(time.Tuesday))
+	assert.Equal(t, time.Tuesday, EndOfWeek(time.Wednesday))
+	assert.Equal(t, time.Wednesday, EndOfWeek(time.Thursday))
+	assert.Equal(t, time.Thursday, EndOfWeek(time.Friday))
+	assert.Equal(t, time.Friday, EndOfWeek(time.Saturday))
+	assert.Equal(t, time.Saturday, EndOfWeek(time.Sunday))
 }
 
 func TestLocalWeekday(t *testing.T) {
+	t.Parallel()
+
 	sow := time.Monday
 
-	require.Equal(t, 0, LocalWeekday(sow, time.Monday))
-	require.Equal(t, 1, LocalWeekday(sow, time.Tuesday))
-	require.Equal(t, 2, LocalWeekday(sow, time.Wednesday))
-	require.Equal(t, 3, LocalWeekday(sow, time.Thursday))
-	require.Equal(t, 4, LocalWeekday(sow, time.Friday))
-	require.Equal(t, 5, LocalWeekday(sow, time.Saturday))
-	require.Equal(t, 6, LocalWeekday(sow, time.Sunday))
+	assert.Equal(t, 0, LocalWeekday(sow, time.Monday))
+	assert.Equal(t, 1, LocalWeekday(sow, time.Tuesday))
+	assert.Equal(t, 2, LocalWeekday(sow, time.Wednesday))
+	assert.Equal(t, 3, LocalWeekday(sow, time.Thursday))
+	assert.Equal(t, 4, LocalWeekday(sow, time.Friday))
+	assert.Equal(t, 5, LocalWeekday(sow, time.Saturday))
+	assert.Equal(t, 6, LocalWeekday(sow, time.Sunday))
 }
 
 func TestFromStd(t *testing.T) {
+	t.Parallel()
+
 	ut := FromStd(testTime())
 	require.Equal(t, testTime(), ut.Time)
 }
 
 func TestFromPB(t *testing.T) {
+	t.Parallel()
+
 	tt := testTime().Round(time.Nanosecond)
 	pb := timestamppb.New(tt)
 	ut := FromPB(pb)
@@ -53,6 +62,8 @@ func TestFromPB(t *testing.T) {
 }
 
 func TestNow(t *testing.T) {
+	t.Parallel()
+
 	now := time.Now()
 	ut := Now()
 
@@ -60,6 +71,8 @@ func TestNow(t *testing.T) {
 }
 
 func TestDate(t *testing.T) {
+	t.Parallel()
+
 	tt := testTime()
 	ut := Date(tt.Year(), tt.Month(), tt.Day(), tt.Hour(), tt.Minute(), tt.Second(), tt.Nanosecond(), tt.Location())
 
@@ -67,6 +80,8 @@ func TestDate(t *testing.T) {
 }
 
 func TestUnix(t *testing.T) {
+	t.Parallel()
+
 	tt := testTime()
 	ut := Unix(tt.Unix(), testNsec).UTC()
 
@@ -74,6 +89,8 @@ func TestUnix(t *testing.T) {
 }
 
 func TestTime_Std(t *testing.T) {
+	t.Parallel()
+
 	tt := testTime()
 	ut := Time{Time: tt}
 
@@ -81,6 +98,8 @@ func TestTime_Std(t *testing.T) {
 }
 
 func TestTime_PB(t *testing.T) {
+	t.Parallel()
+
 	tt := testTime()
 	ut := Time{Time: tt}
 
@@ -88,6 +107,8 @@ func TestTime_PB(t *testing.T) {
 }
 
 func TestTime_MarshalJSON(t *testing.T) {
+	t.Parallel()
+
 	forTime := func(t *testing.T, tt time.Time) {
 		t.Helper()
 
@@ -108,139 +129,154 @@ func TestTime_MarshalJSON(t *testing.T) {
 		require.Equal(t, expected, string(data))
 	}
 
-	t.Run("time", func(t *testing.T) { forTime(t, testTime()) })
-	t.Run("zero", func(t *testing.T) { forTime(t, time.Time{}) })
+	t.Run("time", func(t *testing.T) { t.Parallel(); forTime(t, testTime()) })
+	t.Run("zero", func(t *testing.T) { t.Parallel(); forTime(t, time.Time{}) })
 }
 
 func TestTime_UnmarshalJSON(t *testing.T) {
+	t.Parallel()
+
 	s := struct {
 		T Time `json:"t"`
 	}{}
 
-	t.Run(
-		"time", func(t *testing.T) {
-			tt := testTime().Round(time.Second)
-			err := json.Unmarshal([]byte(`{"t":"`+tt.Format(MarshalFormat)+`"}`), &s)
-			require.NoError(t, err)
-			require.Equal(t, tt, s.T.Time.UTC())
-		},
-	)
+	t.Run("time", func(t *testing.T) {
+		t.Parallel()
 
-	t.Run(
-		"zero", func(t *testing.T) {
-			err := json.Unmarshal([]byte(`{"t":null}`), &s)
-			require.NoError(t, err)
-			require.True(t, s.T.IsZero())
-		},
-	)
+		tt := testTime().Round(time.Second)
+		err := json.Unmarshal([]byte(`{"t":"`+tt.Format(MarshalFormat)+`"}`), &s)
+		require.NoError(t, err)
+		require.Equal(t, tt, s.T.Time.UTC())
+	})
+
+	t.Run("zero", func(t *testing.T) {
+		t.Parallel()
+
+		err := json.Unmarshal([]byte(`{"t":null}`), &s)
+		require.NoError(t, err)
+		require.True(t, s.T.IsZero())
+	})
 }
 
 func TestTime_MarshalText(t *testing.T) {
-	t.Run(
-		"time", func(t *testing.T) {
-			tt := testTime()
-			ut := Time{Time: tt}
-			data, err := ut.MarshalText()
+	t.Parallel()
 
-			require.NoError(t, err)
-			require.Equal(t, tt.Format(MarshalFormat), string(data))
-		},
-	)
+	t.Run("time", func(t *testing.T) {
+		t.Parallel()
 
-	t.Run(
-		"zero", func(t *testing.T) {
-			ut := Time{}
-			data, err := ut.MarshalText()
+		tt := testTime()
+		ut := Time{Time: tt}
+		data, err := ut.MarshalText()
 
-			require.NoError(t, err)
-			require.Empty(t, data)
-		},
-	)
+		require.NoError(t, err)
+		require.Equal(t, tt.Format(MarshalFormat), string(data))
+	})
+
+	t.Run("zero", func(t *testing.T) {
+		t.Parallel()
+
+		ut := Time{}
+		data, err := ut.MarshalText()
+
+		require.NoError(t, err)
+		require.Empty(t, data)
+	})
 }
 
 func TestTime_UnmarshalText(t *testing.T) {
-	ut := Time{}
+	t.Parallel()
 
-	t.Run(
-		"time", func(t *testing.T) {
-			tt := testTime().Round(time.Second)
-			err := ut.UnmarshalText([]byte(tt.Format(MarshalFormat)))
-			require.NoError(t, err)
-			require.Equal(t, tt, ut.Time.UTC())
-		},
-	)
+	t.Run("time", func(t *testing.T) {
+		t.Parallel()
 
-	t.Run(
-		"zero", func(t *testing.T) {
-			err := ut.UnmarshalText([]byte(""))
-			require.NoError(t, err)
-			require.True(t, ut.IsZero())
-		},
-	)
+		tt := testTime().Round(time.Second)
+		ut := Time{}
+
+		err := ut.UnmarshalText([]byte(tt.Format(MarshalFormat)))
+		require.NoError(t, err)
+		require.Equal(t, tt, ut.Time.UTC())
+	})
+
+	t.Run("zero", func(t *testing.T) {
+		t.Parallel()
+
+		ut := Time{}
+
+		err := ut.UnmarshalText([]byte(""))
+		require.NoError(t, err)
+		require.True(t, ut.IsZero())
+	})
 }
 
 func TestTime_MarshalBinary(t *testing.T) {
-	t.Run(
-		"time", func(t *testing.T) {
-			tt := testTime()
-			ut := Time{Time: tt}
+	t.Parallel()
 
-			data, err := ut.MarshalBinary()
-			require.NoError(t, err)
+	t.Run("time", func(t *testing.T) {
+		t.Parallel()
 
-			expected, err := tt.MarshalBinary()
-			require.NoError(t, err)
+		tt := testTime()
+		ut := Time{Time: tt}
 
-			require.Equal(t, expected, data)
-		},
-	)
+		data, err := ut.MarshalBinary()
+		require.NoError(t, err)
 
-	t.Run(
-		"zero", func(t *testing.T) {
-			ut := Time{}
+		expected, err := tt.MarshalBinary()
+		require.NoError(t, err)
 
-			data, err := ut.MarshalBinary()
-			require.NoError(t, err)
+		require.Equal(t, expected, data)
+	})
 
-			expected, err := time.Time{}.MarshalBinary()
-			require.NoError(t, err)
+	t.Run("zero", func(t *testing.T) {
+		t.Parallel()
 
-			require.Equal(t, expected, data)
-		},
-	)
+		ut := Time{}
+
+		data, err := ut.MarshalBinary()
+		require.NoError(t, err)
+
+		expected, err := time.Time{}.MarshalBinary()
+		require.NoError(t, err)
+
+		require.Equal(t, expected, data)
+	})
 }
 
 func TestTime_UnmarshalBinary(t *testing.T) {
-	ut := Time{}
+	t.Parallel()
 
-	t.Run(
-		"time", func(t *testing.T) {
-			tt := testTime().Round(time.Second)
+	t.Run("time", func(t *testing.T) {
+		t.Parallel()
 
-			ttBin, err := tt.MarshalBinary()
-			require.NoError(t, err)
+		tt := testTime().Round(time.Second)
+		ut := Time{}
 
-			err = ut.UnmarshalBinary(ttBin)
-			require.NoError(t, err)
+		ttBin, err := tt.MarshalBinary()
+		require.NoError(t, err)
 
-			require.Equal(t, tt, ut.Time.UTC())
-		},
-	)
+		err = ut.UnmarshalBinary(ttBin)
+		require.NoError(t, err)
 
-	t.Run(
-		"zero", func(t *testing.T) {
-			nowBin, err := time.Time{}.MarshalBinary()
-			require.NoError(t, err)
+		require.Equal(t, tt, ut.Time.UTC())
+	})
 
-			err = ut.UnmarshalBinary(nowBin)
-			require.NoError(t, err)
+	t.Run("zero", func(t *testing.T) {
+		t.Parallel()
 
-			require.True(t, ut.IsZero())
-		},
-	)
+		ut := Time{}
+
+		nowBin, err := time.Time{}.MarshalBinary()
+		require.NoError(t, err)
+
+		err = ut.UnmarshalBinary(nowBin)
+		require.NoError(t, err)
+
+		require.True(t, ut.IsZero())
+	})
 }
 
 func TestTime_Value(t *testing.T) {
+	t.Parallel()
+
 	tt := testTime()
 	ut := Time{Time: tt}
 
@@ -251,27 +287,33 @@ func TestTime_Value(t *testing.T) {
 }
 
 func TestTime_Scan(t *testing.T) {
-	ut := Time{}
+	t.Parallel()
 
-	t.Run(
-		"time", func(t *testing.T) {
-			tt := testTime()
-			err := ut.Scan(tt)
-			require.NoError(t, err)
-			require.Equal(t, tt.Local(), ut.Time)
-		},
-	)
+	t.Run("time", func(t *testing.T) {
+		t.Parallel()
 
-	t.Run(
-		"zero", func(t *testing.T) {
-			err := ut.Scan(nil)
-			require.NoError(t, err)
-			require.True(t, ut.IsZero())
-		},
-	)
+		tt := testTime()
+		ut := Time{}
+
+		err := ut.Scan(tt)
+		require.NoError(t, err)
+		require.Equal(t, tt.Local(), ut.Time)
+	})
+
+	t.Run("zero", func(t *testing.T) {
+		t.Parallel()
+
+		ut := Time{}
+
+		err := ut.Scan(nil)
+		require.NoError(t, err)
+		require.True(t, ut.IsZero())
+	})
 }
 
 func TestTime_After(t *testing.T) {
+	t.Parallel()
+
 	tt := testTime()
 	ut := Time{Time: tt}
 
@@ -280,6 +322,8 @@ func TestTime_After(t *testing.T) {
 }
 
 func TestTime_Before(t *testing.T) {
+	t.Parallel()
+
 	tt := testTime()
 	ut := Time{Time: tt}
 
@@ -288,6 +332,8 @@ func TestTime_Before(t *testing.T) {
 }
 
 func TestTime_Equal(t *testing.T) {
+	t.Parallel()
+
 	tt := testTime()
 	ut := Time{Time: tt}
 
@@ -296,6 +342,8 @@ func TestTime_Equal(t *testing.T) {
 }
 
 func TestTime_AddDate(t *testing.T) {
+	t.Parallel()
+
 	tt := testTime()
 	ut := Time{Time: tt}
 
@@ -306,6 +354,8 @@ func TestTime_AddDate(t *testing.T) {
 }
 
 func TestTime_Add(t *testing.T) {
+	t.Parallel()
+
 	tt := testTime()
 	ut := Time{Time: tt}
 
@@ -316,6 +366,8 @@ func TestTime_Add(t *testing.T) {
 }
 
 func TestTime_Sub(t *testing.T) {
+	t.Parallel()
+
 	tt := testTime()
 	ut := Time{Time: tt}
 	sub := time.Now()
@@ -327,6 +379,8 @@ func TestTime_Sub(t *testing.T) {
 }
 
 func TestTime_UTC(t *testing.T) {
+	t.Parallel()
+
 	tt := testTime()
 	ut := Time{Time: tt}
 
@@ -337,6 +391,8 @@ func TestTime_UTC(t *testing.T) {
 }
 
 func TestTime_Local(t *testing.T) {
+	t.Parallel()
+
 	tt := testTime()
 	ut := Time{Time: tt}
 
@@ -347,6 +403,8 @@ func TestTime_Local(t *testing.T) {
 }
 
 func TestTime_In(t *testing.T) {
+	t.Parallel()
+
 	tt := testTime()
 	ut := Time{Time: tt}
 
@@ -357,6 +415,8 @@ func TestTime_In(t *testing.T) {
 }
 
 func TestTime_ZoneBounds(t *testing.T) {
+	t.Parallel()
+
 	tt := testTime()
 	ut := Time{Time: tt}
 
@@ -368,6 +428,8 @@ func TestTime_ZoneBounds(t *testing.T) {
 }
 
 func TestTime_Truncate(t *testing.T) {
+	t.Parallel()
+
 	tt := testTime()
 	ut := Time{Time: tt}
 
@@ -378,6 +440,8 @@ func TestTime_Truncate(t *testing.T) {
 }
 
 func TestTime_Round(t *testing.T) {
+	t.Parallel()
+
 	tt := testTime()
 	ut := Time{Time: tt}
 
@@ -388,6 +452,8 @@ func TestTime_Round(t *testing.T) {
 }
 
 func TestTime_Between(t *testing.T) {
+	t.Parallel()
+
 	tt := testTime()
 	ut := Time{Time: tt}
 
@@ -396,12 +462,16 @@ func TestTime_Between(t *testing.T) {
 }
 
 func TestTime_LocalWeekday(t *testing.T) {
+	t.Parallel()
+
 	ut := Time{Time: testTime()}
 	require.Equal(t, time.Thursday, ut.Weekday())
 	require.Equal(t, 3, ut.LocalWeekday())
 }
 
 func TestTime_StartOfDay(t *testing.T) {
+	t.Parallel()
+
 	tt := testTime()
 	ut := Time{Time: tt}
 	startOfDay := ut.StartOfDay()
@@ -414,6 +484,8 @@ func TestTime_StartOfDay(t *testing.T) {
 }
 
 func TestTime_EndOfDay(t *testing.T) {
+	t.Parallel()
+
 	tt := testTime()
 	ut := Time{Time: tt}
 	endOfDay := ut.EndOfDay()
@@ -426,6 +498,8 @@ func TestTime_EndOfDay(t *testing.T) {
 }
 
 func TestTime_StartOfWeek(t *testing.T) {
+	t.Parallel()
+
 	tt := testTime()
 	ut := Time{Time: tt}
 	startOfWeek := ut.StartOfWeek()
@@ -435,6 +509,8 @@ func TestTime_StartOfWeek(t *testing.T) {
 }
 
 func TestTime_EndOfWeek(t *testing.T) {
+	t.Parallel()
+
 	tt := testTime()
 	ut := Time{Time: tt}
 	endOfWeek := ut.EndOfWeek()
@@ -444,6 +520,8 @@ func TestTime_EndOfWeek(t *testing.T) {
 }
 
 func TestTime_StartOfMonth(t *testing.T) {
+	t.Parallel()
+
 	tt := testTime()
 	ut := Time{Time: tt}
 	startOfMonth := ut.StartOfMonth()
@@ -456,6 +534,8 @@ func TestTime_StartOfMonth(t *testing.T) {
 }
 
 func TestTime_EndOfMonth(t *testing.T) {
+	t.Parallel()
+
 	tt := testTime()
 	ut := Time{Time: tt}
 	endOfMonth := ut.EndOfMonth()

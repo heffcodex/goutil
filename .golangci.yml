@@ -513,6 +513,7 @@ linters:
     - forbidigo
     - forcetypeassert
     - funlen
+    - gci
     - ginkgolinter
     - gochecknoglobals
     - gochecknoinits

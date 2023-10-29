@@ -13,17 +13,10 @@ go get github.com/heffcodex/goutil/v2
 ## Contents
 Most of the methods over standard types (primitives, arrays, maps) are generic.
 
-- [uarray](https://github.com/heffcodex/goutil/tree/master/uarray) - array helpers:
-  - convert (from map)
-  - map
-  - merge
-  - in-place reverse
-  - clustering
-  - diffing
-  - filtering
-  - searching
 - [uconst](https://github.com/heffcodex/goutil/tree/master/uconst) - useful constants:
   - sizes
+- [uerr](https://github.com/heffcodex/goutil/tree/master/uerr) - error helpers:
+  - call chain stopper
 - [umap](https://github.com/heffcodex/goutil/tree/master/umap) - map helpers:
   - convert (from array)
 - [umath](https://github.com/heffcodex/goutil/tree/master/umath) - math helpers:
@@ -33,6 +26,15 @@ Most of the methods over standard types (primitives, arrays, maps) are generic.
 - [umime](https://github.com/heffcodex/goutil/tree/master/umime) - MIME helpers:
   - stream MIME validation
   - MIME-aware file extension replacement
+- [uslice](https://github.com/heffcodex/goutil/tree/master/uslice) - slice helpers:
+  - convert (from map)
+  - map
+  - merge
+  - in-place reverse
+  - clustering
+  - diffing
+  - filtering
+  - searching
 - [usync](https://github.com/heffcodex/goutil/tree/master/usync) - thread-safe types:
   - generic syncmap
 - [utime](https://github.com/heffcodex/goutil/tree/master/utime) - time.Time wrapper:

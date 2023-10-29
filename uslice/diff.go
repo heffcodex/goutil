@@ -1,18 +1,18 @@
-package uarray
+package uslice
 
 // KeyFn provides a way to extract comparable keys from slice elements.
 // For example, it may be ID of the struct or even the element itself (see KeyValue) for primitive types,
 // but it is important to keep these keys short to avoid memory bloat.
-type KeyFn[T any, K comparable] func(a T) K
+type KeyFn[K comparable, V any] func(v V) K
 
 // KeyValue is a KeyFn that uses provided value itself as a key.
-func KeyValue[T comparable](v T) T {
+func KeyValue[V comparable](v V) V {
 	return v
 }
 
 // Diff works just like DiffIndex and on a base of it, but returns the resulting slice elements of the difference.
 // See the corresponding function for more details.
-func Diff[T any, K comparable](actual, desired []T, keyFn KeyFn[T, K]) (eq, rm, add []T) {
+func Diff[K comparable, V any](actual, desired []V, keyFn KeyFn[K, V]) (eq, rm, add []V) {
 	if len(actual) == 0 {
 		return nil, nil, desired
 	}
@@ -23,9 +23,9 @@ func Diff[T any, K comparable](actual, desired []T, keyFn KeyFn[T, K]) (eq, rm, 
 
 	iEq, iRm, iAdd := DiffIndex(actual, desired, keyFn)
 
-	eq = make([]T, len(iEq))
-	rm = make([]T, len(iRm))
-	add = make([]T, len(iAdd))
+	eq = make([]V, len(iEq))
+	rm = make([]V, len(iRm))
+	add = make([]V, len(iAdd))
 
 	maxLen := max(len(eq), len(rm), len(add))
 
@@ -50,7 +50,7 @@ func Diff[T any, K comparable](actual, desired []T, keyFn KeyFn[T, K]) (eq, rm, 
 // `eq` - the indices of the elements of `actual` slice that are _equal_ to the desired (i.e. may stay at their current place).
 // `rm` - the indices of the elements of `actual` slice that are _not equal_ to the desired (i.e. needs to be removed from `actual`).
 // `add` - the indices of the elements of `desired` slice that are _not equal_ to the actual (i.e. needs to be appended to `actual`).
-func DiffIndex[T any, K comparable](actual, desired []T, keyFn KeyFn[T, K]) (eq, rm, add []int) {
+func DiffIndex[K comparable, V any](actual, desired []V, keyFn KeyFn[K, V]) (eq, rm, add []int) {
 	if len(actual) == 0 {
 		return nil, nil, series(len(desired))
 	}

@@ -11,6 +11,8 @@ type invertZero bool
 func (iz invertZero) IsZero() bool { return !bool(iz) }
 
 func TestIsZero(t *testing.T) {
+	t.Parallel()
+
 	assert.True(t, IsZero((*int)(nil)))
 	assert.True(t, IsZero(""))
 	assert.True(t, IsZero(0))

@@ -11,6 +11,8 @@ import (
 )
 
 func TestIntervalFromPB(t *testing.T) {
+	t.Parallel()
+
 	start := time.Now()
 	end := start.Add(time.Second)
 
@@ -26,6 +28,8 @@ func TestIntervalFromPB(t *testing.T) {
 }
 
 func TestInclusiveInterval_PB(t *testing.T) {
+	t.Parallel()
+
 	start := Now()
 	end := start.Add(time.Second)
 
@@ -41,7 +45,12 @@ func TestInclusiveInterval_PB(t *testing.T) {
 	}
 
 	for i, tt := range tests {
+		i := i
+		tt := tt
+
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			t.Parallel()
+
 			pb := InclusiveInterval{StartTime: tt.start, EndTime: tt.end}.PB()
 
 			wantEnd := tt.end
@@ -56,6 +65,8 @@ func TestInclusiveInterval_PB(t *testing.T) {
 }
 
 func TestExclusiveInterval_PB(t *testing.T) {
+	t.Parallel()
+
 	start := Now()
 	end := start.Add(time.Second)
 
@@ -71,7 +82,12 @@ func TestExclusiveInterval_PB(t *testing.T) {
 	}
 
 	for i, tt := range tests {
+		i := i
+		tt := tt
+
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			t.Parallel()
+
 			pb := ExclusiveInterval{StartTime: tt.start, EndTime: tt.end}.PB()
 
 			assert.Equal(t, tt.start.PB(), pb.GetStartTime())
@@ -80,7 +96,9 @@ func TestExclusiveInterval_PB(t *testing.T) {
 	}
 }
 
-func TestInclusiveInterval_IsValid(t *testing.T) {
+func TestInclusiveInterval_IsValid(t *testing.T) { //nolint: dupl // ignore for test
+	t.Parallel()
+
 	type test struct {
 		start, end Time
 		ok         bool
@@ -98,14 +116,21 @@ func TestInclusiveInterval_IsValid(t *testing.T) {
 	}
 
 	for i, tt := range tests {
+		i := i
+		tt := tt
+
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			t.Parallel()
+
 			i := InclusiveInterval{StartTime: tt.start, EndTime: tt.end}
 			assert.Equal(t, tt.ok, i.IsValid())
 		})
 	}
 }
 
-func TestExclusiveInterval_IsValid(t *testing.T) {
+func TestExclusiveInterval_IsValid(t *testing.T) { //nolint: dupl // ignore for test
+	t.Parallel()
+
 	type test struct {
 		start, end Time
 		ok         bool
@@ -123,7 +148,12 @@ func TestExclusiveInterval_IsValid(t *testing.T) {
 	}
 
 	for i, tt := range tests {
+		i := i
+		tt := tt
+
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			t.Parallel()
+
 			i := ExclusiveInterval{StartTime: tt.start, EndTime: tt.end}
 			assert.Equal(t, tt.ok, i.IsValid())
 		})
@@ -131,6 +161,8 @@ func TestExclusiveInterval_IsValid(t *testing.T) {
 }
 
 func TestInterval_IsZero(t *testing.T) {
+	t.Parallel()
+
 	assert.True(t, Interval{}.IsZero())
 	assert.False(t, Interval{StartTime: Now()}.IsZero())
 	assert.False(t, Interval{EndTime: Now()}.IsZero())
@@ -138,6 +170,8 @@ func TestInterval_IsZero(t *testing.T) {
 }
 
 func TestInclusiveInterval_IsZero(t *testing.T) {
+	t.Parallel()
+
 	assert.True(t, InclusiveInterval{}.IsZero())
 	assert.False(t, InclusiveInterval{StartTime: Now()}.IsZero())
 	assert.False(t, InclusiveInterval{EndTime: Now()}.IsZero())
@@ -145,6 +179,8 @@ func TestInclusiveInterval_IsZero(t *testing.T) {
 }
 
 func TestExclusiveInterval_IsZero(t *testing.T) {
+	t.Parallel()
+
 	assert.True(t, ExclusiveInterval{}.IsZero())
 	assert.False(t, ExclusiveInterval{StartTime: Now()}.IsZero())
 	assert.False(t, ExclusiveInterval{EndTime: Now()}.IsZero())
@@ -152,6 +188,8 @@ func TestExclusiveInterval_IsZero(t *testing.T) {
 }
 
 func TestInclusiveInterval_Contains(t *testing.T) { //nolint: dupl // it's ok
+	t.Parallel()
+
 	type test struct {
 		start, end, v Time
 		ok            bool
@@ -172,7 +210,12 @@ func TestInclusiveInterval_Contains(t *testing.T) { //nolint: dupl // it's ok
 	}
 
 	for i, tt := range tests {
+		i := i
+		tt := tt
+
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			t.Parallel()
+
 			i := InclusiveInterval{StartTime: tt.start, EndTime: tt.end}
 			assert.Equal(t, tt.ok, i.Contains(tt.v))
 		})
@@ -180,6 +223,8 @@ func TestInclusiveInterval_Contains(t *testing.T) { //nolint: dupl // it's ok
 }
 
 func TestExclusiveInterval_Contains(t *testing.T) { //nolint: dupl // it's ok
+	t.Parallel()
+
 	type test struct {
 		start, end, v Time
 		ok            bool
@@ -200,7 +245,12 @@ func TestExclusiveInterval_Contains(t *testing.T) { //nolint: dupl // it's ok
 	}
 
 	for i, tt := range tests {
+		i := i
+		tt := tt
+
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			t.Parallel()
+
 			i := ExclusiveInterval{StartTime: tt.start, EndTime: tt.end}
 			assert.Equal(t, tt.ok, i.Contains(tt.v))
 		})
@@ -208,6 +258,8 @@ func TestExclusiveInterval_Contains(t *testing.T) { //nolint: dupl // it's ok
 }
 
 func TestInclusiveInterval_Exclusive(t *testing.T) {
+	t.Parallel()
+
 	type test struct {
 		in         InclusiveInterval
 		start, end Time
@@ -227,7 +279,12 @@ func TestInclusiveInterval_Exclusive(t *testing.T) {
 	}
 
 	for i, tt := range tests {
+		i := i
+		tt := tt
+
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			t.Parallel()
+
 			out := tt.in.Exclusive()
 
 			assert.Equal(t, tt.start, out.StartTime)
@@ -237,6 +294,8 @@ func TestInclusiveInterval_Exclusive(t *testing.T) {
 }
 
 func TestExclusiveInterval_Inclusive(t *testing.T) {
+	t.Parallel()
+
 	type test struct {
 		in         ExclusiveInterval
 		start, end Time
@@ -256,7 +315,12 @@ func TestExclusiveInterval_Inclusive(t *testing.T) {
 	}
 
 	for i, tt := range tests {
+		i := i
+		tt := tt
+
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			t.Parallel()
+
 			out := tt.in.Inclusive()
 
 			assert.Equal(t, tt.start, out.StartTime)

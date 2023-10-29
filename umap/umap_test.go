@@ -7,6 +7,8 @@ import (
 )
 
 func TestFromArray(t *testing.T) {
+	t.Parallel()
+
 	m := FromArray([]int{1, 2, 3, 4, 5}, func(item int) int {
 		return item
 	})

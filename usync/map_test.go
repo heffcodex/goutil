@@ -7,6 +7,8 @@ import (
 )
 
 func TestMap_Load(t *testing.T) {
+	t.Parallel()
+
 	m := Map[int, int]{}
 
 	m.Map.Store(1, 1)
@@ -21,6 +23,8 @@ func TestMap_Load(t *testing.T) {
 }
 
 func TestMap_Store(t *testing.T) {
+	t.Parallel()
+
 	m := Map[int, int]{}
 
 	m.Store(1, 1)
@@ -37,6 +41,8 @@ func TestMap_Store(t *testing.T) {
 }
 
 func TestMap_LoadOrStore(t *testing.T) {
+	t.Parallel()
+
 	m := Map[int, int]{}
 
 	m.Map.Store(1, 1)
@@ -51,6 +57,8 @@ func TestMap_LoadOrStore(t *testing.T) {
 }
 
 func TestMap_Delete(t *testing.T) {
+	t.Parallel()
+
 	m := Map[int, int]{}
 
 	m.Map.Store(1, 1)
@@ -68,6 +76,8 @@ func TestMap_Delete(t *testing.T) {
 }
 
 func TestMap_Range(t *testing.T) {
+	t.Parallel()
+
 	m := Map[int, int]{}
 
 	m.Map.Store(1, 1)
@@ -83,6 +93,8 @@ func TestMap_Range(t *testing.T) {
 }
 
 func TestMap_Len(t *testing.T) {
+	t.Parallel()
+
 	m := Map[int, int]{}
 
 	m.Map.Store(1, 1)
@@ -92,6 +104,8 @@ func TestMap_Len(t *testing.T) {
 }
 
 func TestMap_Keys(t *testing.T) {
+	t.Parallel()
+
 	m := Map[int, int]{}
 
 	m.Map.Store(1, 1)
@@ -105,6 +119,8 @@ func TestMap_Keys(t *testing.T) {
 }
 
 func TestMap_Values(t *testing.T) {
+	t.Parallel()
+
 	m := Map[int, int]{}
 
 	m.Map.Store(1, 1)
