@@ -3,9 +3,9 @@ package uslice
 // MapFn converts slice elements.
 type MapFn[V, R any] func(item V) R
 
-// Map iterates over all the elements of the given slice and applies the given function to each element.
+// Map iterates over all the elements of the given slice and applies the given MapFn to each element to construct a new slice.
 func Map[V, R any, S ~[]V](s S, fn MapFn[V, R]) []R {
-	res := make([]R, Len(s))
+	res := make([]R, len(s))
 
 	for i, item := range s {
 		res[i] = fn(item)
