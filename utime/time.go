@@ -61,6 +61,10 @@ func FromStd(t time.Time) Time {
 
 // FromPB creates a Time from a protobuf timestamp.
 func FromPB(t *timestamppb.Timestamp) Time {
+	if !t.IsValid() {
+		return Time{}
+	}
+
 	return FromStd(t.AsTime())
 }
 
@@ -88,6 +92,10 @@ func (t Time) Std() time.Time {
 
 // PB converts a Time to a protobuf timestamp.
 func (t Time) PB() *timestamppb.Timestamp {
+	if t.IsZero() {
+		return nil
+	}
+
 	return timestamppb.New(t.Time)
 }
 
