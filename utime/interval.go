@@ -24,9 +24,19 @@ type (
 
 // IntervalFromPB creates an ExclusiveInterval from the given proto representation.
 func IntervalFromPB(pb *interval.Interval) ExclusiveInterval {
+	var startTime, endTime Time
+
+	if pb.GetStartTime().IsValid() {
+		startTime = FromPB(pb.GetStartTime())
+	}
+
+	if pb.GetEndTime().IsValid() {
+		endTime = FromPB(pb.GetEndTime())
+	}
+
 	return ExclusiveInterval{
-		StartTime: FromPB(pb.GetStartTime()),
-		EndTime:   FromPB(pb.GetEndTime()),
+		StartTime: startTime,
+		EndTime:   endTime,
 	}
 }
 
