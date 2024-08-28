@@ -136,25 +136,27 @@ func TestTime_MarshalJSON(t *testing.T) {
 func TestTime_UnmarshalJSON(t *testing.T) {
 	t.Parallel()
 
-	s := struct {
+	type s struct {
 		T Time `json:"t"`
-	}{}
+	}
 
 	t.Run("time", func(t *testing.T) {
 		t.Parallel()
 
+		sv := s{}
 		tt := testTime().Round(time.Second)
-		err := json.Unmarshal([]byte(`{"t":"`+tt.Format(MarshalFormat)+`"}`), &s)
+		err := json.Unmarshal([]byte(`{"t":"`+tt.Format(MarshalFormat)+`"}`), &sv)
 		require.NoError(t, err)
-		require.Equal(t, tt, s.T.Time.UTC())
+		require.Equal(t, tt, sv.T.Time.UTC())
 	})
 
 	t.Run("zero", func(t *testing.T) {
 		t.Parallel()
 
-		err := json.Unmarshal([]byte(`{"t":null}`), &s)
+		sv := s{}
+		err := json.Unmarshal([]byte(`{"t":null}`), &sv)
 		require.NoError(t, err)
-		require.True(t, s.T.IsZero())
+		require.True(t, sv.T.IsZero())
 	})
 }
 
