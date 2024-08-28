@@ -68,7 +68,7 @@ func TestMap_Delete(t *testing.T) {
 
 	v, ok := m.Map.Load(1)
 	require.False(t, ok)
-	require.Equal(t, nil, v)
+	require.Nil(t, v)
 
 	v, ok = m.Map.Load(2)
 	require.True(t, ok)
@@ -87,6 +87,7 @@ func TestMap_Range(t *testing.T) {
 		func(key int, value int) bool {
 			require.True(t, key == 1 || key == 2)
 			require.True(t, value == 1 || value == 2)
+
 			return true
 		},
 	)

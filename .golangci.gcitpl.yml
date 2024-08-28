@@ -6,7 +6,8 @@ run:
   go: ""
 
 output:
-  format: line-number
+  formats:
+    - format: line-number
   print-issued-lines: false
   print-linter-name: true
   uniq-by-line: true

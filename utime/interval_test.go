@@ -96,7 +96,7 @@ func TestExclusiveInterval_PB(t *testing.T) {
 	}
 }
 
-func TestInclusiveInterval_IsValid(t *testing.T) { //nolint: dupl // ignore for test
+func TestInclusiveInterval_IsValid(t *testing.T) { //nolint:dupl // ignore for test
 	t.Parallel()
 
 	type test struct {
@@ -128,7 +128,7 @@ func TestInclusiveInterval_IsValid(t *testing.T) { //nolint: dupl // ignore for 
 	}
 }
 
-func TestExclusiveInterval_IsValid(t *testing.T) { //nolint: dupl // ignore for test
+func TestExclusiveInterval_IsValid(t *testing.T) { //nolint:dupl // ignore for test
 	t.Parallel()
 
 	type test struct {
@@ -187,7 +187,7 @@ func TestExclusiveInterval_IsZero(t *testing.T) {
 	assert.False(t, ExclusiveInterval{StartTime: Now(), EndTime: Now()}.IsZero())
 }
 
-func TestInclusiveInterval_Contains(t *testing.T) { //nolint: dupl // it's ok
+func TestInclusiveInterval_Contains(t *testing.T) { //nolint:dupl // it's ok
 	t.Parallel()
 
 	type test struct {
@@ -222,7 +222,7 @@ func TestInclusiveInterval_Contains(t *testing.T) { //nolint: dupl // it's ok
 	}
 }
 
-func TestExclusiveInterval_Contains(t *testing.T) { //nolint: dupl // it's ok
+func TestExclusiveInterval_Contains(t *testing.T) { //nolint:dupl // it's ok
 	t.Parallel()
 
 	type test struct {

@@ -56,7 +56,7 @@ func Filter[V any, S ~[]V](s S, fn ...FilterFn[V]) S {
 func Count[V any, S ~[]V](s S, fn ...FilterFn[V]) int {
 	count := 0
 
-	applyFilters(s, fn, func(v V) {
+	applyFilters(s, fn, func(V) {
 		count++
 	})
 

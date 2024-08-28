@@ -25,12 +25,12 @@ var (
 
 // EndOfWeek returns the circular-shifted time.Weekday according to the defined StartOfWeek global variable.
 func EndOfWeek(startOfWeek time.Weekday) time.Weekday {
-	return (startOfWeek + 6) % 7
+	return (startOfWeek + 6) % 7 //nolint:mnd // that's just a formula
 }
 
 // LocalWeekday returns the circular-shifted weekday number [0; 6] according to the given `startOfWeek`.
 func LocalWeekday(startOfWeek, day time.Weekday) int {
-	return int(7+day-startOfWeek) % 7
+	return int(7+day-startOfWeek) % 7 //nolint:mnd // that's just a formula
 }
 
 type iTime interface {
@@ -74,8 +74,8 @@ func Now() Time {
 }
 
 // Date constructs a Time from the given date parts.
-func Date(year int, month time.Month, day, hour, min, sec, nsec int, loc *time.Location) Time {
-	return FromStd(time.Date(year, month, day, hour, min, sec, nsec, loc))
+func Date(year int, month time.Month, day, hour, _min, sec, nsec int, loc *time.Location) Time {
+	return FromStd(time.Date(year, month, day, hour, _min, sec, nsec, loc))
 }
 
 // Unix constructs a Time from the given unix epoch time.
@@ -178,7 +178,7 @@ func (t *Time) UnmarshalBinary(data []byte) error {
 // Value implements the driver.Valuer interface for the defined SQLFormat global variable.
 func (t Time) Value() (driver.Value, error) {
 	if t.IsZero() {
-		return nil, nil
+		return nil, nil //nolint:nilnil // zero case is not an error
 	}
 
 	return t.Format(SQLFormat), nil
@@ -317,7 +317,7 @@ func (t Time) StartOfWeek() Time {
 
 // EndOfWeek returns the end of the week according to the defined StartOfWeek global variable.
 func (t Time) EndOfWeek() Time {
-	return t.AddDate(0, 0, 6-t.LocalWeekday()).EndOfDay()
+	return t.AddDate(0, 0, int(time.Saturday)-t.LocalWeekday()).EndOfDay()
 }
 
 // StartOfMonth returns the start of the month.

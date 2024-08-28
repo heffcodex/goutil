@@ -6,7 +6,8 @@ run:
   go: ""
 
 output:
-  format: line-number
+  formats:
+    - format: line-number
   print-issued-lines: false
   print-linter-name: true
   uniq-by-line: true
@@ -48,11 +49,7 @@ linters-settings:
     disabled-tags:
       - experimental
 
-    enabled-checks:
-      - tooManyResultsChecker
-      - nestingReduce
-      - unnamedResult
-      - truncateCmp
+    # enabled-checks: []
     disabled-checks: []
 
     settings:
@@ -64,8 +61,6 @@ linters-settings:
         sizeThreshold: 80
       ifElseChain:
         minThreshold: 2
-      nestingReduce:
-        bodyWidth: 5
       rangeExprCopy:
         sizeThreshold: 512
         skipTestFuncs: true
@@ -73,14 +68,8 @@ linters-settings:
         sizeThreshold: 128
         skipTestFuncs: true
       ruleguard: {}
-      tooManyResultsChecker:
-        maxResults: 3
-      truncateCmp:
-        skipArchDependent: true
       underef:
         skipRecvDeref: true
-      unnamedResult:
-        checkExported: false
 
   godot:
     scope: declarations
@@ -120,8 +109,6 @@ linters-settings:
     watch-for-scripts: []
 
   govet:
-    check-shadowing: true
-
     settings:
       shadow:
         strict: false
@@ -501,14 +488,13 @@ linters:
     - asciicheck
     - bidichk
     - cyclop
-    - deadcode
     - decorder
     - depguard
     - dupword
+    - err113
     - errchkjson
     - execinquery
     - exhaustive
-    - exhaustivestruct
     - exhaustruct
     - forbidigo
     - forcetypeassert
@@ -521,35 +507,26 @@ linters:
     - goconst
     - gocyclo
     - godox
-    - goerr113
     - gofmt
     - gofumpt
     - goheader
     - goimports
-    - golint
     - gomnd
     - gomoddirectives
     - gosimple
     - grouper
-    - ifshort
     - interfacebloat
-    - interfacer
     - ireturn
     - lll
     - maintidx
-    - maligned
     - misspell
     - nakedret
     - nlreturn
     - nonamedreturns
-    - nosnakecase
-    - scopelint
     - staticcheck
-    - structcheck
     - stylecheck
     - tagalign
     - testpackage
-    - varcheck
     - varnamelen
     - whitespace
     - wrapcheck

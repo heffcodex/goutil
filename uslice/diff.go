@@ -77,7 +77,7 @@ func DiffIndex[K comparable, V any](actual, desired []V, keyFn KeyFn[K, V]) (eq,
 	for i := range desired {
 		k := keyFn(desired[i])
 		sameActual := actualKIdxSame[k]
-		sameDesired := append(desiredKIdxSame[k], i) //nolint: gocritic // appendAssign: false positive
+		sameDesired := append(desiredKIdxSame[k], i) //nolint:gocritic // appendAssign: false positive
 
 		if len(sameActual) < len(sameDesired) {
 			add = append(add, i)
