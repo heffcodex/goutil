@@ -66,17 +66,15 @@ func TestDiff(t *testing.T) { //nolint:dupl // ignore for test
 		},
 	}
 
-	for _, test := range tests {
-		test := test
-
-		t.Run(test.name, func(t *testing.T) {
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			gotEq, gotRm, gotAdd := Diff(test.actual, test.desired, KeyValue[int])
+			gotEq, gotRm, gotAdd := Diff(tt.actual, tt.desired, KeyValue[int])
 
-			assert.Equal(t, test.wantEq, gotEq)
-			assert.Equal(t, test.wantRm, gotRm)
-			assert.Equal(t, test.wantAdd, gotAdd)
+			assert.Equal(t, tt.wantEq, gotEq)
+			assert.Equal(t, tt.wantRm, gotRm)
+			assert.Equal(t, tt.wantAdd, gotAdd)
 		})
 	}
 }
@@ -141,17 +139,15 @@ func TestDiffIndex(t *testing.T) { //nolint:dupl // ignore for test
 		},
 	}
 
-	for _, test := range tests {
-		test := test
-
-		t.Run(test.name, func(t *testing.T) {
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			gotEq, gotRm, gotAdd := DiffIndex(test.actual, test.desired, KeyValue[string])
+			gotEq, gotRm, gotAdd := DiffIndex(tt.actual, tt.desired, KeyValue[string])
 
-			assert.Equal(t, test.wantEq, gotEq)
-			assert.Equal(t, test.wantRm, gotRm)
-			assert.Equal(t, test.wantAdd, gotAdd)
+			assert.Equal(t, tt.wantEq, gotEq)
+			assert.Equal(t, tt.wantRm, gotRm)
+			assert.Equal(t, tt.wantAdd, gotAdd)
 		})
 	}
 }

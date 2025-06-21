@@ -35,9 +35,6 @@ func TestFirst(t *testing.T) {
 	}
 
 	for i, tt := range tests {
-		i := i
-		tt := tt
-
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			t.Parallel()
 			require.ErrorIs(t, First(tt.chain...), tt.want)

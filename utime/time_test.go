@@ -88,6 +88,26 @@ func TestUnix(t *testing.T) {
 	require.Equal(t, tt, ut.Time)
 }
 
+func TestMax(t *testing.T) {
+	t.Parallel()
+
+	ut := FromStd(testTime())
+
+	require.Equal(t, Time{}, Max(Time{}))
+	require.Equal(t, ut, Max(Time{}, ut))
+	require.Equal(t, ut.Add(time.Millisecond), Max(ut.Add(-time.Minute), ut, ut.Add(time.Millisecond)))
+}
+
+func TestMin(t *testing.T) {
+	t.Parallel()
+
+	ut := FromStd(testTime())
+
+	require.Equal(t, Time{}, Min(Time{}))
+	require.Equal(t, Time{}, Min(Time{}, ut))
+	require.Equal(t, ut.Add(-time.Minute), Min(ut.Add(-time.Minute), ut, ut.Add(time.Millisecond)))
+}
+
 func TestTime_Std(t *testing.T) {
 	t.Parallel()
 

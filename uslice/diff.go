@@ -29,7 +29,7 @@ func Diff[K comparable, V any](actual, desired []V, keyFn KeyFn[K, V]) (eq, rm, 
 
 	maxLen := max(len(eq), len(rm), len(add))
 
-	for i := 0; i < maxLen; i++ {
+	for i := range maxLen {
 		if len(eq) > i {
 			eq[i] = actual[iEq[i]]
 		}
@@ -117,7 +117,7 @@ func series(n int) []int {
 
 	s := make([]int, n)
 
-	for i := 0; i < n; i++ {
+	for i := range n {
 		s[i] = i
 	}
 

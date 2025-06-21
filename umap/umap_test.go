@@ -1,11 +1,12 @@
 package umap
 
 import (
+	"maps"
+	"slices"
 	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"golang.org/x/exp/maps"
 )
 
 func TestFromArray(t *testing.T) {
@@ -42,7 +43,7 @@ func TestMap(t *testing.T) {
 		return strconv.Itoa(k), out
 	})
 
-	assert.ElementsMatch(t, maps.Keys(out), []string{"1", "2", "3", "4"})
+	assert.ElementsMatch(t, slices.Collect(maps.Keys(out)), []string{"1", "2", "3", "4"})
 	assert.Equal(t, 1, out["1"])
 	assert.Equal(t, 0, out["2"])
 	assert.Equal(t, 1, out["3"])

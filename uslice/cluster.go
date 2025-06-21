@@ -1,17 +1,16 @@
 package uslice
 
 import (
-	"sort"
-
-	"golang.org/x/exp/maps"
+	"cmp"
+	"maps"
+	"slices"
 
 	"github.com/heffcodex/goutil/v2/uflag"
-	"github.com/heffcodex/goutil/v2/utype"
 )
 
 type (
 	// ClusterKey is a comparable type for cluster keys.
-	ClusterKey interface{ utype.ID }
+	ClusterKey interface{ cmp.Ordered }
 
 	// ClusterSet as a map of clusters.
 	ClusterSet[K ClusterKey, V any, C ~[]V] map[K]C
@@ -21,16 +20,16 @@ type (
 func (s ClusterSet[K, V, C]) SortedKeys(order uflag.Order) []K {
 	keys := maps.Keys(s)
 
-	sort.Slice(keys, func(i, j int) bool {
-		b := keys[i] < keys[j]
-		if order == uflag.DESC {
-			b = !b
-		}
-
-		return b
-	})
-
-	return keys
+	switch order {
+	case uflag.DESC:
+		return slices.SortedFunc(keys, func(a, b K) int {
+			return cmp.Compare(b, a)
+		})
+	case uflag.ASC:
+		fallthrough
+	default:
+		return slices.SortedFunc(keys, cmp.Compare)
+	}
 }
 
 // SortedClusters returns a sorted slice of clusters by direction provided by the uflag.Order.

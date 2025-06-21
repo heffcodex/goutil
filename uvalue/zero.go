@@ -24,7 +24,7 @@ func IsZero[T comparable](v T) bool {
 	}
 
 	if vof.CanConvert(zeroerT) {
-		return vof.Convert(zeroerT).Interface().(zeroer).IsZero()
+		return vof.Convert(zeroerT).Interface().(zeroer).IsZero() //nolint:errcheck // false positive
 	}
 
 	return false

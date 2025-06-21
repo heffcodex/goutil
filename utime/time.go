@@ -50,7 +50,7 @@ type iTime interface {
 var _ iTime = (*Time)(nil)
 
 // Time is a wrapper around time.Time with some useful methods.
-type Time struct{ time.Time }
+type Time struct{ time.Time } //nolint:recvcheck // unmarshallers require a pointer receiver
 
 // constructors:
 
@@ -81,6 +81,30 @@ func Date(year int, month time.Month, day, hour, _min, sec, nsec int, loc *time.
 // Unix constructs a Time from the given unix epoch time.
 func Unix(sec, nsec int64) Time {
 	return FromStd(time.Unix(sec, nsec))
+}
+
+// comparators:
+
+// Max returns the biggest value among the provided arguments.
+func Max(t Time, u ...Time) Time {
+	for _, _u := range u {
+		if _u.After(t) {
+			t = _u //nolint:revive // modifies-parameter: it's a full copy by value
+		}
+	}
+
+	return t
+}
+
+// Min returns the lowest value among the provided arguments.
+func Min(t Time, u ...Time) Time {
+	for _, _u := range u {
+		if _u.Before(t) {
+			t = _u //nolint:revive // modifies-parameter: it's a full copy by value
+		}
+	}
+
+	return t
 }
 
 // converters:

@@ -45,9 +45,6 @@ func TestInclusiveInterval_PB(t *testing.T) {
 	}
 
 	for i, tt := range tests {
-		i := i
-		tt := tt
-
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			t.Parallel()
 
@@ -82,9 +79,6 @@ func TestExclusiveInterval_PB(t *testing.T) {
 	}
 
 	for i, tt := range tests {
-		i := i
-		tt := tt
-
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			t.Parallel()
 
@@ -116,9 +110,6 @@ func TestInclusiveInterval_IsValid(t *testing.T) { //nolint:dupl // ignore for t
 	}
 
 	for i, tt := range tests {
-		i := i
-		tt := tt
-
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			t.Parallel()
 
@@ -148,9 +139,6 @@ func TestExclusiveInterval_IsValid(t *testing.T) { //nolint:dupl // ignore for t
 	}
 
 	for i, tt := range tests {
-		i := i
-		tt := tt
-
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			t.Parallel()
 
@@ -210,9 +198,6 @@ func TestInclusiveInterval_Contains(t *testing.T) { //nolint:dupl // it's ok
 	}
 
 	for i, tt := range tests {
-		i := i
-		tt := tt
-
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			t.Parallel()
 
@@ -245,9 +230,6 @@ func TestExclusiveInterval_Contains(t *testing.T) { //nolint:dupl // it's ok
 	}
 
 	for i, tt := range tests {
-		i := i
-		tt := tt
-
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			t.Parallel()
 
@@ -279,9 +261,6 @@ func TestInclusiveInterval_Exclusive(t *testing.T) {
 	}
 
 	for i, tt := range tests {
-		i := i
-		tt := tt
-
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			t.Parallel()
 
@@ -315,9 +294,6 @@ func TestExclusiveInterval_Inclusive(t *testing.T) {
 	}
 
 	for i, tt := range tests {
-		i := i
-		tt := tt
-
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			t.Parallel()
 
